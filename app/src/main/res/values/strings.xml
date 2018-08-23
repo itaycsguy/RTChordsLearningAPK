@@ -6,8 +6,12 @@
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="upload">Upload</string>
-    <string name="multiple">multiple</string>
+    <string name="multiple">multiple uploads</string>
     <string name="choose_operation">Choose operation</string>
     <string name="search">Search</string>
     <string name="need_to_upload">no image uploaded yet</string>
+    <string name="take_picture">Take picture</string>
+    <string name="edit_image">Edit Image</string>
+    <string name="edit_correct_image">edit correct image</string>
+    <string name="get_image_from_camera">Get image from camera</string>
 </resources>
