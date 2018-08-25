@@ -16,14 +16,15 @@ class SignupActivity : AppCompatActivity() {
         val buttonSignUp = findViewById(R.id.sign_up_button) as Button
         buttonSignUp.setOnClickListener {
             val username = (findViewById(R.id.text_username) as EditText).text.toString()
+//            val email = (findViewById(R.id.text_email) as EditText).text.toString()
             val password = (findViewById(R.id.text_password) as EditText).text.toString()
             val password_confirm = (findViewById(R.id.text_password_confirm) as EditText).text.toString()
             var text = ""
             if (username.length == 0 || password.length == 0 || password_confirm.length == 0) {
                 text = "Missing details."
-            } else if (this.is_exist_username(username)) {
+            } else if (this.isExistUsername(username)) {
                 text = "Username is already exist."
-            } else if (!this.is_valid_password(password)) {
+            } else if (!this.isValidPassword(password)) {
                 text = "Invalid password."
             } else if (password != password_confirm) {
                 text = "Incorrect password."
@@ -34,16 +35,18 @@ class SignupActivity : AppCompatActivity() {
                 text = "Registered!"
                 Toast.makeText(this@SignupActivity, text, Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, SigninActivity::class.java)
+                intent.putExtra("username",username)
+                intent.putExtra("password",password)
                 startActivity(intent)
             }
         }
     }
 
-    private fun is_valid_password(password: String):Boolean{
+    private fun isValidPassword(password: String):Boolean{
         return true
     }
 
-    private fun is_exist_username(username: String):Boolean{
+    private fun isExistUsername(username: String):Boolean{
         return false
     }
 }
