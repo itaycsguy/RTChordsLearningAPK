@@ -2,146 +2,113 @@ package itaycsguy.rtchordslearningapk
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Bundle
-import android.provider.MediaStore
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.app.AppCompatDialogFragment
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.support.design.widget.Snackbar
-import android.support.design.widget.Snackbar.LENGTH_SHORT
-import android.view.View
-import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Bundle
 import android.os.Environment
-import android.support.v4.app.NotificationCompat.getExtras
+import android.os.StrictMode
+import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import android.util.DisplayMetrics
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.menu_activity.*
+import android.view.View
+import android.widget.ImageView
+import android.widget.Toast
 import java.io.File
-import java.util.jar.Manifest
 
 @SuppressLint("ByteOrderMark")
 class MenuActivity : AppCompatActivity() {
     /*
     Variables of the activity
      */
-    lateinit var searchButton : ImageButton
-    lateinit var uploadButton: ImageButton
-    lateinit var editButton: ImageButton
-    lateinit var cameraButton: ImageButton
-    lateinit var imageView : ImageView
-    lateinit var cordinatorView : View
-    /*
-    Testing for crop
-     */
-    lateinit var file : File
-
-    lateinit var cropIntent : Intent
-    lateinit var displayMetrics : DisplayMetrics
-    var width : Int = 0
-    var height : Int = 0
+    private lateinit var imageView : ImageView
+    private lateinit var cordinatorView : View
     lateinit var toolbar : Toolbar
+
+    lateinit var file : File
+    private lateinit var cropIntent : Intent
+
+    private val TAG = "Permissions"
     /*
     Const values for result
      */
-    val PICK_IMAGE = 100
-
-    private val TAG = "Permissions"
-    private val REQUEST_IMAGE_CAPTURE = 1
+    private val REQUEST_GALLERY_IMAGE = 100
+    private val REQUEST_IMAGE_CAPTURE = 0
     private val REQUEST_PERMISSION_CODE = 2
+    private val REQUEST_CROP_CODE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val builder = StrictMode.VmPolicy.Builder()
+        StrictMode.setVmPolicy(builder.build())
         setContentView(R.layout.menu_activity)
         cordinatorView = findViewById(R.id.myCoordinatorLayout)
-//        searchButton = findViewById(R.id.SearchButton)
 
+        imageView = findViewById(R.id.UploadedView)
         toolbar = findViewById(R.id.toolbar)
         toolbar.title = ("Choose Operation")
         setSupportActionBar(toolbar)
-        var permissionCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
-        if (permissionCheck == PackageManager.PERMISSION_DENIED){
-            Log.i(TAG, "Permission to use camera denied")
+
+        val permissionCameraCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+        val permissionWriteCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val permissionReadCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
+        if ((permissionCameraCheck == PackageManager.PERMISSION_DENIED)
+            .or(permissionReadCheck == PackageManager.PERMISSION_DENIED)
+            .or(permissionWriteCheck == PackageManager.PERMISSION_DENIED)
+
+        ) {
+            Log.i(TAG, "One of the Permission has been denied.")
             makeRequest()
         }
-//        uploadButton = findViewById(R.id.UploadButton)
-//        uploadButton.setOnClickListener{
-//            Snackbar.make(cordinatorView, "Sorry Not Implemented Yet!", LENGTH_SHORT).show()
-//        }
-//
-//        editButton = findViewById(R.id.EditButton)
-//        editButton.setOnClickListener{
-//            Snackbar.make(cordinatorView, "Sorry Not Implemented Yet!", LENGTH_SHORT).show()
-//        }
-//        cameraButton = findViewById(R.id.CameraButoon)
-//        cameraButton.setOnClickListener {
-//            openCamera()
-//        }
-        imageView = findViewById(R.id.UploadedView)
-
-//        searchButton.setOnClickListener {
-//            openGallery()
-//        }
 
     }
 
     private fun makeRequest() {
-        ActivityCompat.requestPermissions(this,
-                arrayOf(android.Manifest.permission.CAMERA),
-                REQUEST_PERMISSION_CODE)
+        ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.CAMERA,
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ),
+                REQUEST_PERMISSION_CODE
+        )
     }
 
-//    ﻿override fun onRequestPermissionsResult(requestCode: Int,
-//                                             permissions: Array<String>, grantResults: IntArray) {
-//        when (requestCode) {
-//            REQUEST_PERMISSION_CODE -> {
-//                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-//                    Log.i(TAG, "Permission has been denied by user")
-//                } else {
-//                    Log.i(TAG, "Permission has been granted by user")
-//                }
-//            }
-//        }
-//    }﻿
-    private lateinit var uri: Uri
+    private var uri: Uri? = null
     private lateinit var takePictureIntent: Intent
 
-    private fun openCamera() {
-//        file = File(Environment.getExternalStorageDirectory(),
-//                "file ${System.currentTimeMillis()}.jpg")
-//        uri = Uri.fromFile(file)
-        takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-//        takePictureIntent.putExtra("return-data", true)
-        if (takePictureIntent.resolveActivity(packageManager) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-        }
-
-    }
-
-    private fun openGallery(){
-        val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-        startActivityForResult(gallery, PICK_IMAGE)
-    }
-
-    override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent){
+    override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?){
         super.onActivityResult(requestCode, resultCode, data)
-        if ((resultCode == Activity.RESULT_OK).and(requestCode == PICK_IMAGE)){
-            imageView.setImageURI(data.data)
-        }
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            val extras = data.extras
-            val imageBitmap = extras?.get("data") as Bitmap
-            imageView.setImageBitmap(imageBitmap)
-        }
+            when (requestCode) {
+                REQUEST_GALLERY_IMAGE -> {
+                    uri = data?.data
+                    if (uri != null) {
+                        val path = getImagePathFromInputStreamUri(this, uri!!)
+                        uri = Uri.fromFile(File(path))
+                        imageView.setImageURI(uri)
+                    }
+                }
+                 REQUEST_IMAGE_CAPTURE -> {
+                    if (resultCode == Activity.RESULT_OK) {
+                        if (data != null) {
+                            openCrop()
+                        }
+                    }
+                }
+                REQUEST_CROP_CODE -> {
+                    uri = data?.data
+                    imageView.setImageURI(uri) //TODO: MAKE SURE THE NEW CROPPED IS THE ONE DISPLAYED
+                }
+
+            }
+
 
     }
 
@@ -152,21 +119,62 @@ class MenuActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         item?.let {
-            if (item.itemId == R.id.btn_camera){
-                openCamera()
-            } else if (item.itemId == R.id.btn_gallery){
-                openGallery()
+            when {
+                item.itemId == R.id.btn_camera -> openCamera()
+                item.itemId == R.id.btn_gallery -> openGallery()
+                item.itemId == R.id.btn_crop -> openCrop()
             }
         }
-        return false
+        return true
     }
 
+    private fun openCrop() {
+        try {
+            cropIntent = Intent("com.android.camera.action.CROP")
+            cropIntent.setDataAndType(uri,"image/*")
+            cropIntent.putExtra("crop", "true")
+            cropIntent.putExtra("scaleUpIfNeeded", "true")
+            cropIntent.putExtra("outputX", "180")
+            cropIntent.putExtra("aspectX", "3")
+            cropIntent.putExtra("aspectY", "4")
+            cropIntent.putExtra("outputY", "180")
+            cropIntent.putExtra("return-data", "true")
+            startActivityForResult(cropIntent, REQUEST_CROP_CODE)
+        }
+        catch (exception : ActivityNotFoundException){
+            Toast.makeText(this, "couldn't crop", Toast.LENGTH_SHORT  ).show()
+        }
+    }
 
+    private fun openCamera() {
+        takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        file = File(Environment.getExternalStorageDirectory(),
+                "chord_${System.currentTimeMillis()}.jpg")
+        uri = Uri.fromFile(file)
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+        takePictureIntent.putExtra("return-data", true)
+        takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+    }
 
-    //    TODO:This is how to swap activities!
-//    fun activitySwap(){
-//        startActivity(Intent(this, secondActivity::class.java))
-//    }
+    private fun openGallery(){
+        // TODO: 2 WAYS HERE TO OPEN DIFFERENT GALLERY SO TRY THEM BOTH
+        // val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        val gallery = Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        gallery.type = "image/*"
+        startActivityForResult(Intent.createChooser(gallery, "Select Image from the gallery"), REQUEST_GALLERY_IMAGE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when(requestCode){
+            REQUEST_PERMISSION_CODE -> {
+                if ((grantResults.isNotEmpty()).and(grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+                    Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
+                } else{
+                    Toast.makeText(this, "Permission Canceled", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
 }
-
