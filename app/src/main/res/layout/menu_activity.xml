@@ -1,107 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/myCoordinatorLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MenuActivity">
-    <!--android:background="@drawable/music_notes_bg" if we want in the future this is how to upload a picture as BG-->
+    android:layout_height="match_parent">
 
-    <CheckBox
-        android:id="@+id/multipleUpload"
-        android:layout_width="93dp"
-        android:layout_height="27dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="52dp"
-        android:text="@string/multiple"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/UploadButton"
-        app:layout_constraintVertical_bias="0.0" />
+    <RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MenuActivity"
+        tools:layout_editor_absoluteY="81dp">
 
-    <TextView
-        android:id="@+id/operationText"
-        android:layout_width="283dp"
-        android:layout_height="81dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="28dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/choose_operation"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.523"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_constraintVertical_chainStyle="spread_inside" />
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_blue_bright"
+            android:minHeight="?android:attr/actionBarSize" />
 
-    <ImageButton
-        android:id="@+id/SearchButton"
-        android:layout_width="96dp"
-        android:layout_height="61dp"
-        android:layout_marginBottom="148dp"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/holo_green_light"
-        android:contentDescription="@string/search"
-        android:src="@android:drawable/ic_search_category_default"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        <ImageView
+            android:id="@+id/UploadedView"
+            android:layout_below="@id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/SearchText"
-        android:layout_width="0dp"
-        android:layout_height="18dp"
-        android:layout_marginBottom="4dp"
-        android:layout_marginEnd="111dp"
-        android:layout_marginStart="67dp"
-        android:text="@string/search"
-        app:layout_constraintBottom_toTopOf="@+id/SearchButton"
-        app:layout_constraintEnd_toStartOf="@+id/UploadText"
-        app:layout_constraintStart_toStartOf="parent" />
+    </RelativeLayout>
 
-    <ImageButton
-        android:id="@+id/UploadButton"
-        android:layout_width="112dp"
-        android:layout_height="63dp"
-        android:layout_marginBottom="150dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="64dp"
-        android:background="#f2ea0b"
-        android:contentDescription="@string/upload"
-        android:src="@android:drawable/ic_menu_upload_you_tube"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/SearchButton"
-        app:layout_constraintTop_toBottomOf="@+id/operationText"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:id="@+id/UploadText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="87dp"
-        android:text="@string/upload"
-        app:layout_constraintBottom_toTopOf="@+id/UploadButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/SearchText" />
-
-    <ImageView
-        android:id="@+id/UploadedView"
-        android:layout_width="287dp"
-        android:layout_height="170dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="88dp"
-        android:contentDescription="@string/need_to_upload"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_report_image" />
-
-</android.support.constraint.ConstraintLayout>
+</android.support.design.widget.CoordinatorLayout>
