@@ -1,6 +1,5 @@
-package itaycsguy.rtchordslearningapk
+package app.itaycsguy.musiciansaidb
 
-import android.app.ProgressDialog.show
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -8,14 +7,11 @@ import android.support.constraint.ConstraintLayout
 import android.view.View
 import android.widget.*
 import com.google.android.gms.auth.api.Auth
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.common.internal.BaseGmsClient
-import kotlinx.android.synthetic.main.activity_main.*
 
 class SigninActivity : AppCompatActivity() , View.OnClickListener,GoogleApiClient.OnConnectionFailedListener{
     override fun onConnectionFailed(p0: ConnectionResult) {
@@ -56,12 +52,12 @@ class SigninActivity : AppCompatActivity() , View.OnClickListener,GoogleApiClien
         }
         val buttonSignUp = findViewById(R.id.sign_up_button) as Button
         buttonSignUp.setOnClickListener {
-            val intent = Intent(this, SignupActivity::class.java)
+            val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
         val forgotButton = findViewById(R.id.forgot_button) as Button
         forgotButton.setOnClickListener {
-            val intent = Intent(this, SigninRecoveryActivity::class.java)
+            val intent = Intent(this, SignInRecoveryActivity::class.java)
             startActivity(intent)
         }
     }
