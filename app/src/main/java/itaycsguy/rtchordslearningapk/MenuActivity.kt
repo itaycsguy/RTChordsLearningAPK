@@ -34,11 +34,11 @@ class MenuActivity : AppCompatActivity() {
     lateinit var file : File
     private lateinit var cropIntent : Intent
 
-    private val TAG = "Permissions"
     /*
     Const values for result
      */
     private val REQUEST_GALLERY_IMAGE = 100
+    private val TAG = "Permissions"
     private val REQUEST_IMAGE_CAPTURE = 0
     private val REQUEST_PERMISSION_CODE = 2
     private val REQUEST_CROP_CODE = 1
@@ -162,7 +162,6 @@ class MenuActivity : AppCompatActivity() {
         // val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         val gallery = Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         gallery.type = "image/*"
-        print("DEMI PRINT FOR PUSH TO WORK!")
         startActivityForResult(Intent.createChooser(gallery, "Select Image from the gallery"), REQUEST_GALLERY_IMAGE)
     }
 

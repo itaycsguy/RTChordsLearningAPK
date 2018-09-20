@@ -13,13 +13,13 @@ class SignupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_third)
 
-        val buttonSignUp = findViewById(R.id.sign_up_button) as Button
+        val buttonSignUp = findViewById<Button>(R.id.sign_up_button)
         buttonSignUp.setOnClickListener {
-            val username = (findViewById(R.id.text_username) as EditText).text.toString()
-            val password = (findViewById(R.id.text_password) as EditText).text.toString()
-            val password_confirm = (findViewById(R.id.text_password_confirm) as EditText).text.toString()
+            val username = (findViewById<EditText>(R.id.text_username)).text.toString()
+            val password = (findViewById<EditText>(R.id.text_password)).text.toString()
+            val password_confirm = (findViewById<EditText>(R.id.text_password_confirm)).text.toString()
             var text = ""
-            if (username.length == 0 || password.length == 0 || password_confirm.length == 0) {
+            if (username.isEmpty() || password.isEmpty() || password_confirm.isEmpty()) {
                 text = "Missing details."
             } else if (this.is_exist_username(username)) {
                 text = "Username is already exist."
@@ -28,7 +28,7 @@ class SignupActivity : AppCompatActivity() {
             } else if (password != password_confirm) {
                 text = "Incorrect password."
             }
-            if (text.length > 0) {
+            if (text.isNotEmpty()) {
                 Toast.makeText(this@SignupActivity, text, Toast.LENGTH_SHORT).show()
             } else {
                 text = "Registered!"

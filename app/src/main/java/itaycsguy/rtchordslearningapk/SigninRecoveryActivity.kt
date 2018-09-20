@@ -13,12 +13,12 @@ class SigninRecoveryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fourth)
 
-        val sendButton = findViewById(R.id.send_button) as Button
+        val sendButton = findViewById<Button>(R.id.send_button)
         sendButton.setOnClickListener {
-            val emailAddrText = (findViewById(R.id.email_address_text) as EditText).text.toString()
-            if(emailAddrText.length > 0) {
+            val emailAddrText = (findViewById<EditText>(R.id.email_address_text)).text.toString()
+            if(emailAddrText.isNotEmpty()) {
                 this.send_email_with_details_to(emailAddrText)
-                val text = "An email is send to " + emailAddrText + "!\nCheck you email inbox."
+                val text = "An email is send to $emailAddrText!\nCheck you email inbox."
                 Toast.makeText(this@SigninRecoveryActivity, text, Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, SigninActivity::class.java)
                 startActivity(intent)
@@ -30,6 +30,6 @@ class SigninRecoveryActivity : AppCompatActivity() {
     }
 
     private fun send_email_with_details_to(emailAddr: String){
-
+    //TODO: NOT IMPLEMENTED YET
     }
 }
