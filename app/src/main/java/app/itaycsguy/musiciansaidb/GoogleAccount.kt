@@ -4,6 +4,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
+import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -59,6 +60,7 @@ class GoogleAccount(currentActivity : AppCompatActivity) :  GoogleApiClient.OnCo
         this.setGoogleResult(result)
         if(result.isSuccess) {
             val account = (result.signInAccount as GoogleSignInAccount)
+            // TODO: need to understand how to check if google image is uploaded by the user or picked randomly by the provider
             val map : HashMap<String,String> = HashMap()
             map["user_name"] = account.displayName.toString()
             map["email"] = account.email.toString()

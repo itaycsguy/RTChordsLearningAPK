@@ -1,5 +1,6 @@
 package app.itaycsguy.musiciansaidb
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.media.MediaScannerConnection
@@ -24,6 +25,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 
+@SuppressLint("Registered")
 @Suppress("NAME_SHADOWING")
 class SignupActivity : AppCompatActivity() , View.OnClickListener {
     private val _database : FirebaseDatabase = FirebaseDatabase.getInstance()

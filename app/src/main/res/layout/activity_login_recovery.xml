@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/sol_key"
-    tools:context=".LoginRecoveryActivity">
+    tools:context="app.itaycsguy.musiciansaidb.LoginRecoveryActivity">
 
     <EditText
         android:id="@+id/text_email_recovery"
@@ -20,22 +20,22 @@
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toTopOf="@+id/send_recovery_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintHorizontal_bias="0.571"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.965" />
+        app:layout_constraintVertical_bias="0.904" />
 
     <Button
         android:id="@+id/send_recovery_button"
         android:layout_width="97dp"
         android:layout_height="39dp"
-        android:layout_marginBottom="228dp"
+        android:layout_marginBottom="328dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:text="Send"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.236"
+        app:layout_constraintHorizontal_bias="0.295"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -50,10 +50,10 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/text_email_recovery"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.87"
+        app:layout_constraintHorizontal_bias="0.91"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.447" />
+        app:layout_constraintVertical_bias="0.43" />
 
     <Button
         android:id="@+id/cancel_recovery_button"
@@ -61,11 +61,12 @@
         android:layout_height="39dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="Cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.382"
+        app:layout_constraintHorizontal_bias="0.371"
         app:layout_constraintStart_toEndOf="@+id/send_recovery_button"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.516" />
+        app:layout_constraintTop_toBottomOf="@+id/text_email_recovery"
+        app:layout_constraintVertical_bias="0.062" />
 </android.support.constraint.ConstraintLayout>

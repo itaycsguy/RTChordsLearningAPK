@@ -1,5 +1,6 @@
 package app.itaycsguy.musiciansaidb
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
@@ -10,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 
 
+@SuppressLint("Registered")
 class ProfileActivity : AppCompatActivity() {
     private val _firebase : Firebase = Firebase()
     private lateinit var _authenticationVendor : String
@@ -30,9 +32,8 @@ class ProfileActivity : AppCompatActivity() {
         this._givenName = this.intent.getStringExtra("given_name")
         this._familyName = this.intent.getStringExtra("family_name")
         this._permission = this.intent.getStringExtra("permission")
-        val localImage = findViewById<ImageView>(R.id.my_profile_photo)
         if(this._image != null && this._image != Uri.EMPTY && this._image != Uri.parse("null")) {
-            localImage.setImageURI(this._image)
+            findViewById<ImageView>(R.id.my_profile_photo).setImageURI(this._image)
         }
         findViewById<TextView>(R.id.profile_username).append(" ${this._username}")
         findViewById<TextView>(R.id.profile_email).append(" ${this._email}")

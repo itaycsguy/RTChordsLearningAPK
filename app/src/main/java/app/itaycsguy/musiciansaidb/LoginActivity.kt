@@ -1,11 +1,13 @@
 package app.itaycsguy.musiciansaidb
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
 
 
+@SuppressLint("Registered")
 class LoginActivity : AppCompatActivity() {
     val SIGNUPRETCODE = 0
     val FORGOTRETCODE = 0

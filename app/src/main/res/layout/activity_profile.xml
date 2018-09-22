@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity">
+    tools:context="app.itaycsguy.musiciansaidb.ProfileActivity">
 
     <ImageView
         android:id="@+id/my_profile_photo"
@@ -16,15 +16,16 @@
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.152"
+        app:layout_constraintVertical_bias="0.16"
         app:srcCompat="@mipmap/facebook_photo_blank" />
 
     <TextView
         android:id="@+id/profile_username"
-        android:layout_width="207dp"
-        android:layout_height="21dp"
+        android:layout_width="245dp"
+        android:layout_height="20dp"
         android:layout_marginBottom="324dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -32,15 +33,14 @@
         android:text="User Name:"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.602"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/my_profile_photo"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.231" />
 
     <TextView
         android:id="@+id/profile_email"
-        android:layout_width="207dp"
-        android:layout_height="21dp"
+        android:layout_width="245dp"
+        android:layout_height="20dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -48,10 +48,9 @@
         android:text="Email:"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.602"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_username"
-        app:layout_constraintVertical_bias="0.017" />
+        app:layout_constraintVertical_bias="0.015" />
 
     <TextView
         android:id="@+id/my_profile_view"
@@ -77,28 +76,28 @@
         android:text="Continue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sign_out_profile_button"
-        app:layout_constraintHorizontal_bias="0.302"
+        app:layout_constraintHorizontal_bias="0.559"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.863" />
+        app:layout_constraintVertical_bias="0.747" />
 
     <Button
         android:id="@+id/sign_out_profile_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="52dp"
+        android:layout_marginEnd="80dp"
         android:layout_marginTop="8dp"
         android:text="Sign-Out"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.863" />
+        app:layout_constraintVertical_bias="0.746" />
 
     <TextView
         android:id="@+id/profile_permission"
-        android:layout_width="207dp"
-        android:layout_height="21dp"
+        android:layout_width="245dp"
+        android:layout_height="20dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -106,47 +105,43 @@
         android:text="Permission:"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.602"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_authentication_vendor"
-        app:layout_constraintVertical_bias="0.037" />
+        app:layout_constraintVertical_bias="0.048" />
 
     <TextView
         android:id="@+id/profile_givenname"
-        android:layout_width="207dp"
-        android:layout_height="21dp"
+        android:layout_width="245dp"
+        android:layout_height="20dp"
         android:layout_marginBottom="244dp"
         android:layout_marginTop="8dp"
         android:text="Given Name:"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.593"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_email"
-        app:layout_constraintVertical_bias="0.352" />
+        app:layout_constraintVertical_bias="0.049" />
 
     <TextView
         android:id="@+id/profile_familyname"
-        android:layout_width="207dp"
-        android:layout_height="21dp"
+        android:layout_width="245dp"
+        android:layout_height="20dp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:text="Family Name:"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.593"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_givenname"
-        app:layout_constraintVertical_bias="0.024" />
+        app:layout_constraintVertical_bias="0.034" />
 
     <TextView
         android:id="@+id/profile_authentication_vendor"
-        android:layout_width="207dp"
-        android:layout_height="21dp"
-        android:layout_marginBottom="184dp"
+        android:layout_width="245dp"
+        android:layout_height="20dp"
+        android:layout_marginBottom="280dp"
         android:text="Authentication Vendor:"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.593"
         app:layout_constraintStart_toStartOf="parent" />
 </android.support.constraint.ConstraintLayout>

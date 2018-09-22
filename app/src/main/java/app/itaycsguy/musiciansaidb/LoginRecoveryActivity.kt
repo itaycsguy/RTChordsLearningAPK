@@ -1,5 +1,6 @@
 package app.itaycsguy.musiciansaidb
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.widget.EditText
 import android.widget.Toast
 
 
+@SuppressLint("Registered")
 class LoginRecoveryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

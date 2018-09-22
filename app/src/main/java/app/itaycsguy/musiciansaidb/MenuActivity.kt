@@ -5,10 +5,9 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Bundle
-import android.os.Environment
-import android.os.StrictMode
+import android.os.*
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -18,27 +17,29 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import java.io.File
 
-@SuppressLint("ByteOrderMark")
-class MenuActivity : AppCompatActivity() {
+@SuppressLint("ByteOrderMark", "Registered")
+class MenuActivity() : AppCompatActivity(), Parcelable {
     /*
     Variables of the activity
      */
     private lateinit var imageView : ImageView
     private lateinit var cordinatorView : View
     lateinit var toolbar : Toolbar
+    lateinit var uploadButton : ImageButton
 
     lateinit var file : File
     private lateinit var cropIntent : Intent
 
-    private val TAG = "Permissions"
     /*
     Const values for result
      */
     private val REQUEST_GALLERY_IMAGE = 100
+    private val TAG = "Permissions"
     private val REQUEST_IMAGE_CAPTURE = 0
     private val REQUEST_PERMISSION_CODE = 2
     private val REQUEST_CROP_CODE = 1
@@ -50,7 +51,7 @@ class MenuActivity : AppCompatActivity() {
         StrictMode.setVmPolicy(builder.build())
         setContentView(R.layout.menu_activity)
         cordinatorView = findViewById(R.id.myCoordinatorLayout)
-
+        uploadButton = findViewById(R.id.UploadButton)
         imageView = findViewById(R.id.UploadedView)
         toolbar = findViewById(R.id.toolbar)
         toolbar.title = ("Choose Operation")
@@ -60,8 +61,8 @@ class MenuActivity : AppCompatActivity() {
         val permissionWriteCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         val permissionReadCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
         if ((permissionCameraCheck == PackageManager.PERMISSION_DENIED)
-            .or(permissionReadCheck == PackageManager.PERMISSION_DENIED)
-            .or(permissionWriteCheck == PackageManager.PERMISSION_DENIED)
+                        .or(permissionReadCheck == PackageManager.PERMISSION_DENIED)
+                        .or(permissionWriteCheck == PackageManager.PERMISSION_DENIED)
 
         ) {
             Log.i(TAG, "One of the Permission has been denied.")
@@ -84,30 +85,39 @@ class MenuActivity : AppCompatActivity() {
     private var uri: Uri? = null
     private lateinit var takePictureIntent: Intent
 
+    constructor(parcel: Parcel) : this() {
+        cropIntent = parcel.readParcelable(Intent::class.java.classLoader)
+        uri = parcel.readParcelable(Uri::class.java.classLoader)
+        takePictureIntent = parcel.readParcelable(Intent::class.java.classLoader)
+    }
+
     override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?){
         super.onActivityResult(requestCode, resultCode, data)
-            when (requestCode) {
-                REQUEST_GALLERY_IMAGE -> {
-                    uri = data?.data
-                    if (uri != null) {
-                        val path = getImagePathFromInputStreamUri(this, uri!!)
-                        uri = Uri.fromFile(File(path))
-                        imageView.setImageURI(uri)
-                    }
+        when (requestCode) {
+            REQUEST_GALLERY_IMAGE -> {
+                uri = data?.data
+                if (uri != null) {
+                    val path = getImagePathFromInputStreamUri(this, uri!!)
+                    uri = Uri.fromFile(File(path))
+                    imageView.setImageURI(uri)
                 }
-                 REQUEST_IMAGE_CAPTURE -> {
-                    if (resultCode == Activity.RESULT_OK) {
-                        if (data != null) {
-                            openCrop()
-                        }
-                    }
-                }
-                REQUEST_CROP_CODE -> {
-                    uri = data?.data
-                    imageView.setImageURI(uri) //TODO: MAKE SURE THE NEW CROPPED IS THE ONE DISPLAYED
-                }
-
             }
+            REQUEST_IMAGE_CAPTURE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    if (data != null) {
+                        openCrop()
+                    }
+                }
+            }
+            REQUEST_CROP_CODE -> {
+                uri = data?.data
+                // Forcing a refresh of the imageView by changing the image.
+                imageView.setImageResource(R.drawable.ic_gallery)
+                MediaScannerConnection.scanFile(this, listOf(uri?.path).toTypedArray(), listOf( "image/jpeg").toTypedArray(), null)
+                imageView.setImageURI(uri)
+            }
+
+        }
 
 
     }
@@ -162,7 +172,6 @@ class MenuActivity : AppCompatActivity() {
         // val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         val gallery = Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         gallery.type = "image/*"
-        print("DEMI PRINT FOR PUSH TO WORK!")
         startActivityForResult(Intent.createChooser(gallery, "Select Image from the gallery"), REQUEST_GALLERY_IMAGE)
     }
 
@@ -178,4 +187,23 @@ class MenuActivity : AppCompatActivity() {
         }
     }
 
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(cropIntent, flags)
+        parcel.writeParcelable(uri, flags)
+        parcel.writeParcelable(takePictureIntent, flags)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<MenuActivity> {
+        override fun createFromParcel(parcel: Parcel): MenuActivity {
+            return MenuActivity(parcel)
+        }
+
+        override fun newArray(size: Int): Array<MenuActivity?> {
+            return arrayOfNulls(size)
+        }
+    }
 }
