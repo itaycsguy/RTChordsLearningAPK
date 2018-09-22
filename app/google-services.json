@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "45656593958",
+    "firebase_url": "https://musiciansdb-ccff5.firebaseio.com",
+    "project_id": "musiciansdb-ccff5",
+    "storage_bucket": "musiciansdb-ccff5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45656593958:android:e35639db79916457",
+        "android_client_info": {
+          "package_name": "app.itaycsguy.musiciansaidb"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "45656593958-pj2vkjosdsfnppbt3n50hrhjnq3upfu8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.itaycsguy.musiciansaidb",
+            "certificate_hash": "ca59bbd02372229307c28505708497bfc05a414b"
+          }
+        },
+        {
+          "client_id": "45656593958-6lf1li9obgs3moqlssm7s6nod9icjtu2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkMidVsJ5OMMxpfslaO41f1qtLqpqQLdc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "45656593958-6lf1li9obgs3moqlssm7s6nod9icjtu2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package itaycsguy.rtchordslearningapk
+package app.itaycsguy.musiciansaidb
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -12,7 +12,10 @@ import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.View
 import android.widget.*
-//import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -21,8 +24,9 @@ import java.util.*
 import kotlin.collections.HashMap
 
 
+@Suppress("NAME_SHADOWING")
 class SignupActivity : AppCompatActivity() , View.OnClickListener {
-//    private val _database : FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val _database : FirebaseDatabase = FirebaseDatabase.getInstance()
     private lateinit var _buttonSignUp : Button
     private lateinit var _photoPath : Uri
     private var _imageview: ImageView? = null
@@ -38,6 +42,7 @@ class SignupActivity : AppCompatActivity() , View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
 
+        findViewById<EditText>(R.id.registiration_email).requestFocus()
         this._buttonSignUp = findViewById<Button>(R.id.registiration_signup_button)
         this._buttonSignUp.setOnClickListener(this)
         val btnAttachPhoto = findViewById<Button>(R.id.registiration_attach_photo_button)
@@ -54,33 +59,55 @@ class SignupActivity : AppCompatActivity() , View.OnClickListener {
                 val username = (findViewById<EditText>(R.id.registiration_username)).text.toString()
                 val password = (findViewById<EditText>(R.id.registiration_password)).text.toString()
                 val photo = this._photoPath.toString()
-                val isValid : Boolean = this.isValidPassword(password) && this.isValidEmail(email)
+                val isValid : Boolean = this.isValidPassword(password) && this.isCorrectEmailFormat(email)
                 val text : String
                 if (!isValid) {
                     text = "Invalid provided details."
                     Toast.makeText(this, text, Toast.LENGTH_LONG).show()
                 } else {
-                    text = "Registered!"
-                    Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+                    val emailParts : List<String> = email.split("@")
+                    val secondPart = emailParts[1].replace(".","_")
+                    val newEmail = emailParts[0] + "_" + secondPart
+                    this._database.reference.child("users/$newEmail").ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(p0: DataSnapshot) {
+                            if(!p0.exists()) {
+                                val map : HashMap<String,String> = HashMap()
+                                map["authentication_vendor"] = "local"
+                                map["user_name"] = username
+                                map["given_name"] = givenname
+                                map["family_name"] = familyname
+                                map["password"] = password
+                                map["email"] = email
+                                map["photo"] = photo
+                                map["permission"] = "anonymous"
+                                writeDB("users/$email",map)
 
-                    val map : HashMap<String,String> = HashMap()
-                    map.put("authentication_vendor", "local")
-                    map.put("user_name", username)
-                    map.put("given_name",givenname)
-                    map.put("family_name",familyname)
-                    map.put("password", password)
-                    map.put("email", email)
-                    map.put("photo",photo)
-                    this.writeDB("users/" + email,map)
+                                val text = "Registered!"
+                                Toast.makeText(this@SignupActivity, text, Toast.LENGTH_LONG).show()
 
-                    val intent = Intent(this, LoginActivity::class.java)
-                    intent.putExtra("email",email)
-                    intent.putExtra("password",password)
-                    intent.putExtra("photo",photo)
-                    startActivity(intent)
+                                val intent = Intent(this@SignupActivity, LoginActivity::class.java)
+                                intent.putExtra("authentication_vendor","local")
+                                intent.putExtra("user_name","username")
+                                intent.putExtra("email",email)
+                                intent.putExtra("password",password)
+                                intent.putExtra("photo",photo)
+                                intent.putExtra("given_name",givenname)
+                                intent.putExtra("family_name",familyname)
+                                intent.putExtra("permission","anonymous")
+                                startActivity(intent)
+                            } else {
+                                val text = "The account does already exist!"
+                                Toast.makeText(this@SignupActivity, text, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                        override fun onCancelled(p0: DatabaseError) {
+                            val text = "Data corruption!"
+                            Toast.makeText(this@SignupActivity, text, Toast.LENGTH_LONG).show()
+                        }
+                    })
+                    }
                 }
-            }
-            R.id.registiration_attach_photo_button -> {
+        R.id.registiration_attach_photo_button -> {
                 this.showPhotoDialog()
             }
         }
@@ -111,7 +138,7 @@ class SignupActivity : AppCompatActivity() , View.OnClickListener {
     }
 
     private fun visibleExploredData(){
-        val phtoPathView = findViewById(R.id.registiration_photo_location_view) as TextView
+        val phtoPathView = findViewById<TextView>(R.id.registiration_photo_location_view)
         phtoPathView.append("Photo Location: " + this._photoPath.toString())
         phtoPathView.visibility = View.VISIBLE
         this._buttonSignUp.visibility = View.VISIBLE
@@ -119,7 +146,7 @@ class SignupActivity : AppCompatActivity() , View.OnClickListener {
 
     public override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        var SUCCESS = true
+        var success = true
         if (requestCode == GALLERY) {
             if (data != null) {
                 val contentURI = data.data
@@ -134,7 +161,7 @@ class SignupActivity : AppCompatActivity() , View.OnClickListener {
                 } catch (e: IOException) {
                     e.printStackTrace()
                     Toast.makeText(this, "Failed!", Toast.LENGTH_SHORT).show()
-                    SUCCESS = true
+                    success = true
                 }
             }
         } else if (requestCode == CAMERA) {
@@ -146,7 +173,7 @@ class SignupActivity : AppCompatActivity() , View.OnClickListener {
             }
             Toast.makeText(this, "Photo Saved!", Toast.LENGTH_SHORT).show()
         }
-        if(SUCCESS) {
+        if(success) {
             this.visibleExploredData()
         }
     }
@@ -163,13 +190,13 @@ class SignupActivity : AppCompatActivity() , View.OnClickListener {
         }
         try {
             Log.d("heel",wallpaperDirectory.toString())
-            val f = File(wallpaperDirectory, ((Calendar.getInstance().getTimeInMillis()).toString() + ".jpg"))
+            val f = File(wallpaperDirectory, ((Calendar.getInstance().timeInMillis).toString() + ".jpg"))
             f.createNewFile()
             val fo = FileOutputStream(f)
             fo.write(bytes.toByteArray())
-            MediaScannerConnection.scanFile(this, arrayOf(f.getPath()), arrayOf("photo/jpeg"), null)
+            MediaScannerConnection.scanFile(this, arrayOf(f.path), arrayOf("photo/jpeg"), null)
             fo.close()
-            Log.d("TAG", "Photo Saved: " + f.getAbsolutePath())
+            Log.d("TAG", "Photo Saved: " + f.absolutePath)
             return f.absolutePath
         } catch (e1: IOException) {
             e1.printStackTrace()
@@ -181,23 +208,21 @@ class SignupActivity : AppCompatActivity() , View.OnClickListener {
         return password.length >= this.PASS_LENGTH
     }
 
-    private fun isValidEmail(email: String):Boolean{
-//        val usersEntry = this._database.getReference("users")
-//        if(usersEntry.child(email).key!!.isEmpty() && this.isCorrectEmailFormat(email)) {
-//            return true
-//        }
-//        return false
+    private fun isCorrectEmailFormat(email: String): Boolean {
+        val pattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+        val match : MatchResult? = pattern.toRegex(setOf(RegexOption.IGNORE_CASE,RegexOption.DOT_MATCHES_ALL)).find(email)
+        match?.let {
+            return true
+        }
         return false
     }
 
-    fun isCorrectEmailFormat(email: String): Boolean {
-        val pattern = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$".toRegex()
-        val matchResult = pattern.matchEntire(email)
-        return matchResult == null
+    private fun writeDB(dbPath : String, map : HashMap<String,String>) {
+        val userEntry = this._database.getReference(dbPath.trim().replace("@","_").replace(".","_"))
+        userEntry.setValue(map)
     }
+}
 
-    fun writeDB(dbPath : String,map : HashMap<String,String>) {
-//        val userEntry = this._database.getReference(dbPath.trim().replace("@","_").replace(".","_"))
-//        userEntry.setValue(map)
-    }
+private fun String.toRegex(s: String) {
+
 }

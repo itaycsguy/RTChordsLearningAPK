@@ -1,13 +1,14 @@
-package itaycsguy.rtchordslearningapk
+package app.itaycsguy.musiciansaidb
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
 
+
 class LoginActivity : AppCompatActivity() {
-    val SIGN_UP_RET_CODE = 0
-    val FORGOT_RET_CODE = 0
+    val SIGNUPRETCODE = 0
+    val FORGOTRETCODE = 0
     // google
     private lateinit var _googleAccount : GoogleAccount
     // firebase
@@ -30,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
         this._localForgotButton = findViewById(R.id.forgot_welcome_button)
         // variables
         this._emailField = findViewById(R.id.text_welcome_email)
+        this._emailField.requestFocus()
         this._passwordField = findViewById(R.id.text_welcome_password)
         this.fillDetails(this.intent)
         // firebase
@@ -43,12 +45,12 @@ class LoginActivity : AppCompatActivity() {
             this._localAuthenticator.validateInputs(this,this._emailField.text.toString(), this._passwordField.text.toString())
         }
         this._localSignUpButton.setOnClickListener {
-            val intent = Intent(this, SignUpActivity::class.java)
-            this.startActivityForResult(intent,this.SIGN_UP_RET_CODE)
+            val intent = Intent(this, SignupActivity::class.java)
+            this.startActivityForResult(intent,this.SIGNUPRETCODE)
         }
         this._localForgotButton.setOnClickListener {
             val intent = Intent(this, LoginRecoveryActivity::class.java)
-            this.startActivityForResult(intent,this.FORGOT_RET_CODE)
+            this.startActivityForResult(intent,this.FORGOTRETCODE)
         }
     }
 
@@ -65,13 +67,13 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == this._googleAccount.REQ_CODE){
+        if(requestCode == this._googleAccount.REQCODE){
             this._googleAccount.handleResults(data)
             this._firebase.connectByGoogle(this._googleAccount.getGoogleResult().signInAccount!!,this, ProfileActivity())
-            this._googleAccount.updateUI(this._googleAccount.SIGNED_IN)
-        } else if(requestCode == this.SIGN_UP_RET_CODE) {
+            this._googleAccount.updateUI(this._googleAccount.SIGNEDIN)
+        } else if(requestCode == this.SIGNUPRETCODE) {
             this._firebase.connectByLocal(this._emailField.text.toString(),this._passwordField.text.toString(),this,ProfileActivity())
-        } else if(requestCode == this.FORGOT_RET_CODE) {
+        } else if(requestCode == this.FORGOTRETCODE) {
             val text = "Find your details through your email account!"
             Toast.makeText(this, text, Toast.LENGTH_LONG).show()
         } else {

@@ -1,4 +1,4 @@
-package itaycsguy.rtchordslearningapk
+package app.itaycsguy.musiciansaidb
 
 import android.annotation.SuppressLint
 import android.app.Activity

@@ -9,7 +9,7 @@
 
     <EditText
         android:id="@+id/text_email_recovery"
-        android:layout_width="wrap_content"
+        android:layout_width="241dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
@@ -29,13 +29,13 @@
         android:id="@+id/send_recovery_button"
         android:layout_width="97dp"
         android:layout_height="39dp"
-        android:layout_marginBottom="236dp"
+        android:layout_marginBottom="228dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:text="Send"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintHorizontal_bias="0.236"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -50,8 +50,22 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/text_email_recovery"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.513"
+        app:layout_constraintHorizontal_bias="0.87"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.46" />
+        app:layout_constraintVertical_bias="0.447" />
+
+    <Button
+        android:id="@+id/cancel_recovery_button"
+        android:layout_width="97dp"
+        android:layout_height="39dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.382"
+        app:layout_constraintStart_toEndOf="@+id/send_recovery_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.516" />
 </android.support.constraint.ConstraintLayout>
