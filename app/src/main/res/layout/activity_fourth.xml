@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SigninRecoveryActivity">
+    tools:context=".SignInRecoveryActivity">
 
     <EditText
         android:id="@+id/email_address_text"

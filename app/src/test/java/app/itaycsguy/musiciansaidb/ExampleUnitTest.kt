@@ -1,4 +1,4 @@
-package itaycsguy.rtchordslearningapk
+package app.itaycsguy.musiciansaidb
 
 import org.junit.Test
 

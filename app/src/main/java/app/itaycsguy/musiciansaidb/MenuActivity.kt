@@ -1,10 +1,11 @@
-package itaycsguy.rtchordslearningapk
+package app.itaycsguy.musiciansaidb
 
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -18,6 +19,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import java.io.File
@@ -30,15 +32,16 @@ class MenuActivity : AppCompatActivity() {
     private lateinit var imageView : ImageView
     private lateinit var cordinatorView : View
     lateinit var toolbar : Toolbar
+    lateinit var uploadButton : ImageButton
 
     lateinit var file : File
     private lateinit var cropIntent : Intent
 
-    private val TAG = "Permissions"
     /*
     Const values for result
      */
     private val REQUEST_GALLERY_IMAGE = 100
+    private val TAG = "Permissions"
     private val REQUEST_IMAGE_CAPTURE = 0
     private val REQUEST_PERMISSION_CODE = 2
     private val REQUEST_CROP_CODE = 1
@@ -50,7 +53,7 @@ class MenuActivity : AppCompatActivity() {
         StrictMode.setVmPolicy(builder.build())
         setContentView(R.layout.menu_activity)
         cordinatorView = findViewById(R.id.myCoordinatorLayout)
-
+        uploadButton = findViewById(R.id.UploadButton)
         imageView = findViewById(R.id.UploadedView)
         toolbar = findViewById(R.id.toolbar)
         toolbar.title = ("Choose Operation")
@@ -104,7 +107,10 @@ class MenuActivity : AppCompatActivity() {
                 }
                 REQUEST_CROP_CODE -> {
                     uri = data?.data
-                    imageView.setImageURI(uri) //TODO: MAKE SURE THE NEW CROPPED IS THE ONE DISPLAYED
+                    // Forcing a refresh of the imageView by changing the image.
+                    imageView.setImageResource(R.drawable.ic_gallery)
+                    MediaScannerConnection.scanFile(this, listOf(uri?.path).toTypedArray(), listOf( "image/jpeg").toTypedArray(), null)
+                    imageView.setImageURI(uri)
                 }
 
             }
@@ -162,7 +168,6 @@ class MenuActivity : AppCompatActivity() {
         // val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         val gallery = Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         gallery.type = "image/*"
-        print("DEMI PRINT FOR PUSH TO WORK!")
         startActivityForResult(Intent.createChooser(gallery, "Select Image from the gallery"), REQUEST_GALLERY_IMAGE)
     }
 
