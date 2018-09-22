@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#87faf6"
     tools:context="app.itaycsguy.musiciansaidb.ProfileActivity">
 
     <ImageView
@@ -19,7 +20,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.16"
+        app:layout_constraintVertical_bias="0.186"
         app:srcCompat="@mipmap/facebook_photo_blank" />
 
     <TextView
@@ -35,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/my_profile_photo"
-        app:layout_constraintVertical_bias="0.231" />
+        app:layout_constraintVertical_bias="0.445" />
 
     <TextView
         android:id="@+id/profile_email"
@@ -50,7 +51,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_username"
-        app:layout_constraintVertical_bias="0.015" />
+        app:layout_constraintVertical_bias="0.002" />
 
     <TextView
         android:id="@+id/my_profile_view"
@@ -58,10 +59,11 @@
         android:layout_height="39dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="40dp"
         android:text="My Profile"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -107,7 +109,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_authentication_vendor"
-        app:layout_constraintVertical_bias="0.048" />
+        app:layout_constraintVertical_bias="0.016" />
 
     <TextView
         android:id="@+id/profile_givenname"
@@ -120,7 +122,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_email"
-        app:layout_constraintVertical_bias="0.049" />
+        app:layout_constraintVertical_bias="0.03" />
 
     <TextView
         android:id="@+id/profile_familyname"
@@ -133,13 +135,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_givenname"
-        app:layout_constraintVertical_bias="0.034" />
+        app:layout_constraintVertical_bias="0.013" />
 
     <TextView
         android:id="@+id/profile_authentication_vendor"
         android:layout_width="245dp"
         android:layout_height="20dp"
-        android:layout_marginBottom="280dp"
+        android:layout_marginBottom="264dp"
         android:text="Authentication Vendor:"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
