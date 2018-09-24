@@ -39,7 +39,6 @@ class ProfileActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.profile_email).append(" ${this._email}")
         findViewById<TextView>(R.id.profile_givenname).append(" ${this._givenName}")
         findViewById<TextView>(R.id.profile_familyname).append(" ${this._familyName}")
-        findViewById<TextView>(R.id.profile_authentication_vendor).append(" ${this._authenticationVendor}")
         findViewById<TextView>(R.id.profile_permission).append(" ${this._permission}")
         val continueButton : Button = findViewById(R.id.continue_profile_button)
         continueButton.setOnClickListener {

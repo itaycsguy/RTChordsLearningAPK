@@ -4,23 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#87faf6"
+    android:background="@mipmap/background1"
     tools:context="app.itaycsguy.musiciansaidb.ProfileActivity">
 
     <ImageView
         android:id="@+id/my_profile_photo"
-        android:layout_width="98dp"
-        android:layout_height="75dp"
+        android:layout_width="149dp"
+        android:layout_height="110dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.186"
+        app:layout_constraintVertical_bias="0.221"
         app:srcCompat="@mipmap/facebook_photo_blank" />
 
     <TextView
@@ -31,7 +30,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="serif"
+        android:gravity="left"
         android:text="User Name:"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,21 +49,28 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="serif"
+        android:gravity="left"
         android:text="Email:"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_username"
-        app:layout_constraintVertical_bias="0.002" />
+        app:layout_constraintVertical_bias="0.014" />
 
     <TextView
         android:id="@+id/my_profile_view"
-        android:layout_width="142dp"
-        android:layout_height="39dp"
+        android:layout_width="196dp"
+        android:layout_height="44dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="40dp"
+        android:fontFamily="serif"
+        android:gravity="center_horizontal"
         android:text="My Profile"
+        android:textColor="@color/colorPrimary"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -75,13 +85,16 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="serif"
+        android:gravity="center_horizontal"
         android:text="Continue"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sign_out_profile_button"
-        app:layout_constraintHorizontal_bias="0.559"
+        app:layout_constraintHorizontal_bias="0.581"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.747" />
+        app:layout_constraintVertical_bias="0.779" />
 
     <Button
         android:id="@+id/sign_out_profile_button"
@@ -90,26 +103,33 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="80dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="serif"
+        android:gravity="center_horizontal"
         android:text="Sign-Out"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.746" />
+        app:layout_constraintVertical_bias="0.781" />
 
     <TextView
         android:id="@+id/profile_permission"
         android:layout_width="245dp"
         android:layout_height="20dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="216dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="serif"
+        android:gravity="left"
         android:text="Permission:"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_authentication_vendor"
-        app:layout_constraintVertical_bias="0.016" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_familyname"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/profile_givenname"
@@ -117,12 +137,16 @@
         android:layout_height="20dp"
         android:layout_marginBottom="244dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="serif"
+        android:gravity="left"
         android:text="Given Name:"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_email"
-        app:layout_constraintVertical_bias="0.03" />
+        app:layout_constraintVertical_bias="0.05" />
 
     <TextView
         android:id="@+id/profile_familyname"
@@ -130,20 +154,15 @@
         android:layout_height="20dp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="serif"
+        android:gravity="left"
         android:text="Family Name:"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_givenname"
-        app:layout_constraintVertical_bias="0.013" />
+        app:layout_constraintVertical_bias="0.007" />
 
-    <TextView
-        android:id="@+id/profile_authentication_vendor"
-        android:layout_width="245dp"
-        android:layout_height="20dp"
-        android:layout_marginBottom="264dp"
-        android:text="Authentication Vendor:"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 </android.support.constraint.ConstraintLayout>

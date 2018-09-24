@@ -224,7 +224,3 @@ class SignupActivity : AppCompatActivity() , View.OnClickListener {
         userEntry.setValue(map)
     }
 }
-
-private fun String.toRegex(s: String) {
-
-}

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/blur_chords"
+    android:background="@mipmap/background1"
     tools:context="app.itaycsguy.musiciansaidb.LoginRecoveryActivity">
 
     <EditText
@@ -16,14 +16,16 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:fontFamily="serif"
+        android:gravity="center_horizontal"
         android:hint="Email Address"
         android:inputType="textEmailAddress"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/send_recovery_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.571"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.904" />
+        app:layout_constraintVertical_bias="0.831" />
 
     <Button
         android:id="@+id/send_recovery_button"
@@ -32,28 +34,34 @@
         android:layout_marginBottom="328dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:fontFamily="serif"
+        android:gravity="center_horizontal"
         android:text="Send"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.295"
+        app:layout_constraintHorizontal_bias="0.258"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/details_recovery_view"
-        android:layout_width="306dp"
+        android:layout_width="270dp"
         android:layout_height="45dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="serif"
+        android:gravity="center_horizontal"
         android:text="Details Recovery"
+        android:textColor="@color/colorPrimary"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/text_email_recovery"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.91"
+        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.43" />
+        app:layout_constraintVertical_bias="0.429" />
 
     <Button
         android:id="@+id/cancel_recovery_button"
@@ -62,11 +70,14 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="serif"
+        android:gravity="center_horizontal"
         android:text="Cancel"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.371"
+        app:layout_constraintHorizontal_bias="0.456"
         app:layout_constraintStart_toEndOf="@+id/send_recovery_button"
         app:layout_constraintTop_toBottomOf="@+id/text_email_recovery"
-        app:layout_constraintVertical_bias="0.062" />
+        app:layout_constraintVertical_bias="0.106" />
 </android.support.constraint.ConstraintLayout>
