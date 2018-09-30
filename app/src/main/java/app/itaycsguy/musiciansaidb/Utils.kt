@@ -68,3 +68,16 @@ private fun createTemporalFile(context : Context): File {
     "chord_${System.currentTimeMillis()}.jpg")
 //    return File(context.externalCacheDir, "tempFile.jpg") // context needed
 }
+
+val PASSWORD_LENGTH = 8
+
+fun isValidPassword(password: String):Boolean{
+    return password.length >= PASSWORD_LENGTH
+}
+
+fun isCorrectEmailFormat(email: String): Boolean {
+    val pattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+    val match : MatchResult? = pattern.toRegex(setOf(RegexOption.IGNORE_CASE,RegexOption.DOT_MATCHES_ALL)).find(email)
+    match?.let { return true }
+    return false
+}

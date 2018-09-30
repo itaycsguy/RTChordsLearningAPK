@@ -3,6 +3,10 @@ package app.itaycsguy.musiciansaidb
 class User(details : HashMap<String,String>) {
     private val _details : HashMap<*, *> = details.clone() as HashMap<*, *>
 
+    fun getHashDetails() : HashMap<*, *> {
+        return _details
+    }
+
     fun getUserName() : String {
         return this._details["user_name"].toString()
     }
@@ -21,5 +25,13 @@ class User(details : HashMap<String,String>) {
 
     fun getFamilyName() : String {
         return this._details["family_name"].toString()
+    }
+
+    fun getAuthenticationVendor() : String {
+        return this._details["authentication_vendor"].toString()
+    }
+
+    fun getPermission() : String {
+        return this._details["permission"].toString()
     }
 }
