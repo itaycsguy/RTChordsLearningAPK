@@ -44,6 +44,9 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     private val REQUEST_PERMISSION_CODE = 2
     private val REQUEST_CROP_CODE = 1
 
+    private var uri: Uri? = null
+    private lateinit var takePictureIntent: Intent
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -82,8 +85,6 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         )
     }
 
-    private var uri: Uri? = null
-    private lateinit var takePictureIntent: Intent
 
     constructor(parcel: Parcel) : this() {
         cropIntent = parcel.readParcelable(Intent::class.java.classLoader)
@@ -110,15 +111,19 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
                 }
             }
             REQUEST_CROP_CODE -> {
-                uri = data?.data
-                // Forcing a refresh of the imageView by changing the image.
-                imageView.setImageResource(R.drawable.ic_gallery)
-                MediaScannerConnection.scanFile(this, listOf(uri?.path).toTypedArray(), listOf( "image/jpeg").toTypedArray(), null)
-                imageView.setImageURI(uri)
+                if (data?.data != null) {
+                    uri = data?.data
+                    // Forcing a refresh of the imageView by changing the image.
+                    imageView.setImageResource(R.drawable.ic_gallery)
+                    MediaScannerConnection.scanFile(this, listOf(uri?.path).toTypedArray(), listOf("image/jpeg").toTypedArray(), null)
+                    imageView.setImageURI(uri)
+                }
+                else {
+                    Toast.makeText(this, "Crop not done, no change needed.", Toast.LENGTH_SHORT).show()
+                }
             }
 
         }
-
 
     }
 
@@ -140,16 +145,22 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
 
     private fun openCrop() {
         try {
-            cropIntent = Intent("com.android.camera.action.CROP")
-            cropIntent.setDataAndType(uri,"image/*")
-            cropIntent.putExtra("crop", "true")
-            cropIntent.putExtra("scaleUpIfNeeded", "true")
-            cropIntent.putExtra("outputX", "180")
-            cropIntent.putExtra("aspectX", "3")
-            cropIntent.putExtra("aspectY", "4")
-            cropIntent.putExtra("outputY", "180")
-            cropIntent.putExtra("return-data", "true")
-            startActivityForResult(cropIntent, REQUEST_CROP_CODE)
+            //First we check if there was a picture picked and the wanted crop isn't on the filler.
+            if (uri == null) {
+              Toast.makeText(this,"In order to crop you need to first pick a picture", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                cropIntent = Intent("com.android.camera.action.CROP")
+                cropIntent.setDataAndType(uri, "image/*")
+                cropIntent.putExtra("crop", "true")
+                cropIntent.putExtra("scaleUpIfNeeded", "true")
+                cropIntent.putExtra("outputX", "180")
+                cropIntent.putExtra("aspectX", "3")
+                cropIntent.putExtra("aspectY", "4")
+                cropIntent.putExtra("outputY", "180")
+                cropIntent.putExtra("return-data", "true")
+                startActivityForResult(cropIntent, REQUEST_CROP_CODE)
+            }
         }
         catch (exception : ActivityNotFoundException){
             Toast.makeText(this, "couldn't crop", Toast.LENGTH_SHORT  ).show()

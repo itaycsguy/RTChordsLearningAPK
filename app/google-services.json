@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "45656593958-s8t7t6u6lr4cb6mmluvemju0jradncba.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.itaycsguy.musiciansaidb",
+            "certificate_hash": "5ae262f2f82592f073eb92272fa3a3bcfb2e66ab"
+          }
+        },
+        {
           "client_id": "45656593958-6lf1li9obgs3moqlssm7s6nod9icjtu2.apps.googleusercontent.com",
           "client_type": 3
         }
