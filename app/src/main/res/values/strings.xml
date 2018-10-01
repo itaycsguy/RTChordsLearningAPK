@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RTChordsLearningAPK</string>
+    <string name="app_name">MusiciansAIDB</string>
     <string name="sign_in">Sign-In</string>
     <string name="sign_up">Sign-Up</string>
     <string name="title_activity_upload_page">UploadPage</string>
@@ -14,4 +14,7 @@
     <string name="edit_image">Edit Image</string>
     <string name="edit_correct_image">edit correct image</string>
     <string name="get_image_from_camera">Get image from camera</string>
+    <string name="request_client_id">45656593958-6lf1li9obgs3moqlssm7s6nod9icjtu2.apps.googleusercontent.com</string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">Item Detail</string>
 </resources>
