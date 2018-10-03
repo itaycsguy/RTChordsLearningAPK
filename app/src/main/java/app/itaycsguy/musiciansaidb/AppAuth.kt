@@ -1,7 +1,6 @@
 package app.itaycsguy.musiciansaidb
 
 import android.content.Intent
-import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.TextView
@@ -10,10 +9,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 
-class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) {
+class AppAuth(act : AppCompatActivity, fbDb : FirebaseDB) {
     private val REQUEST_CODE = 0
     private val _act : StartActivity = act as StartActivity
-    private val _fbDb = fbDb
+    private val _firebassDB = fbDb
     private lateinit var _signInResult : HashMap<String,String>
 
 
@@ -44,7 +43,7 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) {
     }
 
     private fun checkExistAccount(email: String,password: String) {
-        (_fbDb.getRef())!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
+        (_firebassDB.getRef())?.child("users/${FirebaseDB.encodeUserEmail(email)}")?.ref?.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
                 if (p0.exists() && p0.child("authentication_vendor").value == "app") {
                     if (p0.child("password").value == password) {
@@ -58,17 +57,22 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) {
                         map["family_name"] = p0.child("family_name").value.toString()
                         map["permission"] = p0.child("permission").value.toString()
                         val intent = _act.intent
-                        intent.putExtra("data",map)
-                        _act.onActivityResultWrapper(REQUEST_CODE,intent)
+                        intent.putExtra("data", map)
+                        _act.onActivityResultWrapper(REQUEST_CODE, intent)
                     }
                 } else { Toast.makeText(_act, "The account does not exist!", Toast.LENGTH_LONG).show() }
             }
 
             override fun onCancelled(p0: DatabaseError) { Toast.makeText(_act, "Data corruption!", Toast.LENGTH_LONG).show() }
         })
+
     }
 
     fun handleResults(data : Intent?){
-        if(data!!.hasExtra("data")) _signInResult = data.getSerializableExtra("data") as HashMap<String, String>
+        data?.let {
+            if (it.hasExtra("data")){
+                _signInResult = data.getSerializableExtra("data") as HashMap<String, String>
+            }
+        }
     }
 }

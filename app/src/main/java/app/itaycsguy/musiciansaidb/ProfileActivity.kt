@@ -27,10 +27,14 @@ class ProfileActivity : AppCompatActivity() {
 //            findViewById<ImageView>(R.id.my_profile_photo).setImageURI(Uri.parse(_user.getPhoto()))
             // TODO: need to classify between google default photo to uploaded user photo
         }
-        findViewById<Button>(R.id.continue_profile_button).setOnClickListener { startActivity(Intent(this, MenuActivity::class.java)) }
+        findViewById<Button>(R.id.continue_profile_button).setOnClickListener {
+            val intent = Intent(this, MenuActivity::class.java)
+            intent.putExtra("user",_user.getHashDetails())
+            startActivity(intent)
+        }
         findViewById<Button>(R.id.sign_out_profile_button).setOnClickListener {
             _fbAuth.disconnect()
-            val intent = Intent(this,StartActivity::class.java)
+            val intent = Intent(this, StartActivity::class.java)
             intent.putExtra("user",_user.getHashDetails())
             startActivity(intent)
         }

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
+import android.os.SystemClock.sleep
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -27,8 +28,10 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     /*
     Variables of the activity
      */
-    private lateinit var imageView : ImageView
+    private lateinit var currentImage : ImageView
     private lateinit var cordinatorView : View
+    private lateinit var _user : User
+    private val _firebaseDB : FirebaseDB = FirebaseDB()
     lateinit var toolbar : Toolbar
     lateinit var uploadButton : ImageButton
 
@@ -50,12 +53,14 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        _user = User(intent.getSerializableExtra("user") as HashMap<String,String>)
+        Toast.makeText(this, "Logged in as ${_user.getUserName()}.", Toast.LENGTH_SHORT).show()
         val builder = StrictMode.VmPolicy.Builder()
         StrictMode.setVmPolicy(builder.build())
         setContentView(R.layout.menu_activity)
         cordinatorView = findViewById(R.id.myCoordinatorLayout)
         uploadButton = findViewById(R.id.UploadButton)
-        imageView = findViewById(R.id.UploadedView)
+        currentImage = findViewById(R.id.UploadedView)
         toolbar = findViewById(R.id.toolbar)
         toolbar.title = ("Choose Operation")
         setSupportActionBar(toolbar)
@@ -70,6 +75,20 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         ) {
             Log.i(TAG, "One of the Permission has been denied.")
             makeRequest()
+        }
+
+        uploadButton.setOnClickListener {
+            val infoText: String = if (_user.getPermission() == "anonymous"){
+                _firebaseDB.writeTempImg(currentImage)
+                "The Image is pending for approval before entering our database, thanks for your support"
+            } else {
+                //TODO: change the user's permission to be an enum with the different permissions and address them all here.
+                _firebaseDB.writeImg(currentImage)
+                "The Image is automatically approved since you possess the right permission level"
+            }
+            Toast.makeText(this, "Image successfully uploaded onto our database.", Toast.LENGTH_SHORT).show()
+            sleep(5000)
+            Toast.makeText(this, infoText, Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -100,7 +119,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
                 if (uri != null) {
                     val path = getImagePathFromInputStreamUri(this, uri!!)
                     uri = Uri.fromFile(File(path))
-                    imageView.setImageURI(uri)
+                    currentImage.setImageURI(uri)
                 }
             }
             REQUEST_IMAGE_CAPTURE -> {
@@ -113,10 +132,10 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
             REQUEST_CROP_CODE -> {
                 if (data?.data != null) {
                     uri = data?.data
-                    // Forcing a refresh of the imageView by changing the image.
-                    imageView.setImageResource(R.drawable.ic_gallery)
+                    // Forcing a refresh of the currentImage by changing the image.
+                    currentImage.setImageResource(R.drawable.ic_gallery)
                     MediaScannerConnection.scanFile(this, listOf(uri?.path).toTypedArray(), listOf("image/jpeg").toTypedArray(), null)
-                    imageView.setImageURI(uri)
+                    currentImage.setImageURI(uri)
                 }
                 else {
                     Toast.makeText(this, "Crop not done, no change needed.", Toast.LENGTH_SHORT).show()
