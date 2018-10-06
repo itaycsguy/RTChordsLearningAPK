@@ -35,7 +35,8 @@ class FirebaseDB {
     fun writeTempImg(img : ImageView){
 
         val userEntry = _firebaseDB.getReference("temp_img")
-        userEntry.setValue(img.drawable)
+//        System.err.println("the drawable object looks like this: ${img.drawable}")
+//        userEntry.setValue(img.drawable)
     }
 
     fun writeImg(img : ImageView){

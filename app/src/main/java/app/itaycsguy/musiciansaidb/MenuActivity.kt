@@ -2,6 +2,7 @@ package app.itaycsguy.musiciansaidb
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,6 +11,7 @@ import android.net.Uri
 import android.os.*
 import android.os.SystemClock.sleep
 import android.provider.MediaStore
+import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -21,7 +23,14 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import java.io.File
+import java.lang.Exception
+import java.util.*
 
 @SuppressLint("ByteOrderMark", "Registered")
 class MenuActivity() : AppCompatActivity(), Parcelable {
@@ -31,7 +40,12 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     private lateinit var currentImage : ImageView
     private lateinit var cordinatorView : View
     private lateinit var _user : User
+
+    //Firebase
+    private lateinit var _firebaseStorage : FirebaseStorage
+    private lateinit var _storageReference : StorageReference
     private val _firebaseDB : FirebaseDB = FirebaseDB()
+
     lateinit var toolbar : Toolbar
     lateinit var uploadButton : ImageButton
 
@@ -52,9 +66,15 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //Firebase Init:
+        _firebaseStorage = FirebaseStorage.getInstance()
+        _storageReference = _firebaseStorage.reference
 
+        //Get user data from Start Activity
         _user = User(intent.getSerializableExtra("user") as HashMap<String,String>)
         Toast.makeText(this, "Logged in as ${_user.getUserName()}.", Toast.LENGTH_SHORT).show()
+
+
         val builder = StrictMode.VmPolicy.Builder()
         StrictMode.setVmPolicy(builder.build())
         setContentView(R.layout.menu_activity)
@@ -77,13 +97,13 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
             makeRequest()
         }
 
+
         uploadButton.setOnClickListener {
+            uploadImage()
             val infoText: String = if (_user.getPermission() == "anonymous"){
-                _firebaseDB.writeTempImg(currentImage)
                 "The Image is pending for approval before entering our database, thanks for your support"
             } else {
                 //TODO: change the user's permission to be an enum with the different permissions and address them all here.
-                _firebaseDB.writeImg(currentImage)
                 "The Image is automatically approved since you possess the right permission level"
             }
             Toast.makeText(this, "Image successfully uploaded onto our database.", Toast.LENGTH_SHORT).show()
@@ -151,6 +171,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         return true
     }
 
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         item?.let {
             when {
@@ -160,6 +181,35 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
             }
         }
         return true
+    }
+
+    private fun uploadImage() {
+        if (uri != null){
+            //TODO: find a legit replacement to wokr like the progress dialog since it is deprecated.
+//            val progressDialog = ProgressDialog(this)
+//            progressDialog.setTitle("Uploading...")
+//            progressDialog.show()
+
+            val database : String = if (_user.getPermission() == "anonymous") "temp_images" else "verified_images"
+            val ref = _storageReference.child(
+                    "Images_Database/" +
+                            "$database/" +
+                            "${_user.getUserName()}_${UUID.randomUUID()}")
+            ref.putFile(uri!!)
+                    .addOnSuccessListener {
+//                        progressDialog.dismiss()
+                    }
+                    .addOnFailureListener{
+//                        progressDialog.dismiss()
+                        Toast.makeText(this, "Failed to Upload", Toast.LENGTH_SHORT).show()
+
+                    }
+                    .addOnProgressListener{
+//                        val progress = (100.0*it.bytesTransferred/it.totalByteCount)
+//                        progressDialog.setMessage("Uploading ${progress.toInt()}%")
+                        Toast.makeText(this, "Uploading Iמ progress...", Toast.LENGTH_SHORT).show()
+                    }
+        }
     }
 
     private fun openCrop() {
