@@ -26,7 +26,7 @@ class StartActivity : AppCompatActivity() {
         _gAcct = GoogleAuth(this)
         _aAuth = AppAuth(this, _fbDb)
         _signApp = SignApp(this,_fbDb)
-        _userRecovery = UserRecovery(this)
+        _userRecovery = UserRecovery(this,_fbAuth)
         showLogin(isInit = true)
     }
 
@@ -86,6 +86,8 @@ class StartActivity : AppCompatActivity() {
             _userData = _aAuth.getUserData()
             if(_userData.containsKey("email") && _userData.containsKey("password")) {
                 _fbAuth.connectByAppAcct(_userData["email"].toString(), _userData["password"].toString())
+                findViewById<EditText>(R.id.text_welcome_email).setText(_userData["email"])
+                findViewById<EditText>(R.id.text_welcome_password).setText(_userData["password"])
                 writeProfileOnTransaction()
             }
         } else if(requestCode == _signApp.getReqCode() || requestCode == _signApp.getReqGalCode() || requestCode == _signApp.getReqCamCode()) {
@@ -93,10 +95,13 @@ class StartActivity : AppCompatActivity() {
             if(requestCode != _signApp.getReqCode()) { return }
             _userData = _signApp.getUserData()
             if(_userData.containsKey("email") && _userData.containsKey("password")) {
-                // TODO: put user email and password into fields and try to login for him automatically
+                showLogin()
+                findViewById<EditText>(R.id.text_welcome_email).setText(_userData["email"])
+                findViewById<EditText>(R.id.text_welcome_password).setText(_userData["password"])
+                writeProfileOnTransaction()
             }
         } else if(requestCode == _userRecovery.getReqCode()) {
-            // TODO: handle in somewhat way
+            Toast.makeText(this, "waiting to recovery email...", Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(this, "Some connection error was occur, try again.", Toast.LENGTH_LONG).show()
         }
@@ -105,7 +110,6 @@ class StartActivity : AppCompatActivity() {
     private fun writeProfileOnTransaction() {
         Toast.makeText(this, "Successfully Signed-In!", Toast.LENGTH_LONG).show()
         _fbDb.writeUser(_userData["email"].toString(), _userData)
-        _userData.remove("email")
         userProfileActivityOnStart(User(_userData))
     }
 

@@ -1,8 +1,9 @@
 package app.itaycsguy.musiciansaidb
 
 import android.content.Intent
-import android.os.Build
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -10,7 +11,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 
-class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) {
+class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
     private val REQUEST_CODE = 0
     private val _act : StartActivity = act as StartActivity
     private val _fbDb = fbDb
@@ -18,6 +19,9 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) {
 
 
     fun initOperations() {
+        _act.findViewById<TextView>(R.id.text_welcome_email).addTextChangedListener(this)
+        _act.findViewById<TextView>(R.id.text_welcome_password).addTextChangedListener(this)
+
         _act.findViewById<Button>(R.id.sign_in_welcome_button).setOnClickListener {
             val email =_act.findViewById<TextView>(R.id.text_welcome_email).text.toString()
             val password = _act.findViewById<TextView>(R.id.text_welcome_password).text.toString()
@@ -26,6 +30,17 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) {
         (_act.findViewById<Button>(R.id.sign_up_welcome_button)).setOnClickListener { _act.showSignUp() }
         (_act.findViewById<Button>(R.id.forgot_welcome_button)).setOnClickListener { _act.showRecovery() }
     }
+
+    override fun afterTextChanged(p0: Editable?) {
+        p0?.let {
+            // check spelling
+            Toast.makeText(_act, p0, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    // not relevant but exist
+    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     fun getUserData() : HashMap<String,String> {
         return _signInResult

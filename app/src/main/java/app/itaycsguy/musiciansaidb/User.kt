@@ -27,10 +27,6 @@ class User(details : HashMap<String,String>) {
         return this._details["family_name"].toString()
     }
 
-    fun getAuthenticationVendor() : String {
-        return this._details["authentication_vendor"].toString()
-    }
-
     fun getPermission() : String {
         return this._details["permission"].toString()
     }
