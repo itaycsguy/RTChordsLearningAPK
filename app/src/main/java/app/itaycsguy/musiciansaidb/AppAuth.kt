@@ -2,6 +2,8 @@ package app.itaycsguy.musiciansaidb
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -9,14 +11,17 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 
-class AppAuth(act : AppCompatActivity, fbDb : FirebaseDB) {
+class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
     private val REQUEST_CODE = 0
     private val _act : StartActivity = act as StartActivity
-    private val _firebassDB = fbDb
+    private val _fbDb = fbDb
     private lateinit var _signInResult : HashMap<String,String>
 
 
     fun initOperations() {
+        _act.findViewById<TextView>(R.id.text_welcome_email).addTextChangedListener(this)
+        _act.findViewById<TextView>(R.id.text_welcome_password).addTextChangedListener(this)
+
         _act.findViewById<Button>(R.id.sign_in_welcome_button).setOnClickListener {
             val email =_act.findViewById<TextView>(R.id.text_welcome_email).text.toString()
             val password = _act.findViewById<TextView>(R.id.text_welcome_password).text.toString()
@@ -25,6 +30,17 @@ class AppAuth(act : AppCompatActivity, fbDb : FirebaseDB) {
         (_act.findViewById<Button>(R.id.sign_up_welcome_button)).setOnClickListener { _act.showSignUp() }
         (_act.findViewById<Button>(R.id.forgot_welcome_button)).setOnClickListener { _act.showRecovery() }
     }
+
+    override fun afterTextChanged(p0: Editable?) {
+        p0?.let {
+            // check spelling
+            Toast.makeText(_act, p0, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    // not relevant but exist
+    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     fun getUserData() : HashMap<String,String> {
         return _signInResult
@@ -43,7 +59,7 @@ class AppAuth(act : AppCompatActivity, fbDb : FirebaseDB) {
     }
 
     private fun checkExistAccount(email: String,password: String) {
-        (_firebassDB.getRef())?.child("users/${FirebaseDB.encodeUserEmail(email)}")?.ref?.addListenerForSingleValueEvent(object : ValueEventListener {
+        (_fbDb.getRef())!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
                 if (p0.exists() && p0.child("authentication_vendor").value == "app") {
                     if (p0.child("password").value == password) {
@@ -57,22 +73,17 @@ class AppAuth(act : AppCompatActivity, fbDb : FirebaseDB) {
                         map["family_name"] = p0.child("family_name").value.toString()
                         map["permission"] = p0.child("permission").value.toString()
                         val intent = _act.intent
-                        intent.putExtra("data", map)
-                        _act.onActivityResultWrapper(REQUEST_CODE, intent)
+                        intent.putExtra("data",map)
+                        _act.onActivityResultWrapper(REQUEST_CODE,intent)
                     }
                 } else { Toast.makeText(_act, "The account does not exist!", Toast.LENGTH_LONG).show() }
             }
 
             override fun onCancelled(p0: DatabaseError) { Toast.makeText(_act, "Data corruption!", Toast.LENGTH_LONG).show() }
         })
-
     }
 
     fun handleResults(data : Intent?){
-        data?.let {
-            if (it.hasExtra("data")){
-                _signInResult = data.getSerializableExtra("data") as HashMap<String, String>
-            }
-        }
+        if(data!!.hasExtra("data")) _signInResult = data.getSerializableExtra("data") as HashMap<String, String>
     }
 }

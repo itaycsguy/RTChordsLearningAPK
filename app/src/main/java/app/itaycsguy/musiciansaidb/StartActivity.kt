@@ -8,11 +8,11 @@ import android.widget.Toast
 
 
 class StartActivity : AppCompatActivity() {
-    private var _currentLayout : Int = R.layout.activity_login
-    private lateinit var _firebaseAuth : FirebaseAuth
-    private lateinit var _firebaseDb : FirebaseDB
-    private lateinit var _googleAccount : GoogleAuth
-    private lateinit var _appAuth : AppAuth
+    private var _currLayout : Int = R.layout.activity_login
+    private lateinit var _fbAuth : FirebaseAuth
+    private lateinit var _fbDb : FirebaseDB
+    private lateinit var _gAcct : GoogleAuth
+    private lateinit var _aAuth : AppAuth
     private lateinit var _signApp : SignApp
     private lateinit var _userRecovery : UserRecovery
     private lateinit var _userData : HashMap<String,String>
@@ -20,26 +20,26 @@ class StartActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(_currentLayout)
-        _firebaseAuth = FirebaseAuth(this)
-        _firebaseDb = FirebaseDB()
-        _googleAccount = GoogleAuth(this)
-        _appAuth = AppAuth(this, _firebaseDb)
-        _signApp = SignApp(this,_firebaseDb)
-        _userRecovery = UserRecovery(this)
+        setContentView(_currLayout)
+        _fbAuth = FirebaseAuth(this)
+        _fbDb = FirebaseDB()
+        _gAcct = GoogleAuth(this)
+        _aAuth = AppAuth(this, _fbDb)
+        _signApp = SignApp(this,_fbDb)
+        _userRecovery = UserRecovery(this,_fbAuth)
         showLogin(isInit = true)
     }
 
     override fun onStart() {
         super.onStart()
         if(intent.hasExtra("email") && intent.hasExtra("password")){
-            _appAuth.validOnStart(intent.getStringExtra("email"),intent.getStringExtra("password"))
+            _aAuth.validOnStart(intent.getStringExtra("email"),intent.getStringExtra("password"))
         }
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        if(_currentLayout != R.layout.activity_login) {
+        if(_currLayout != R.layout.activity_login) {
             showLogin()
         } else {
             finish()
@@ -49,24 +49,24 @@ class StartActivity : AppCompatActivity() {
     }
 
     fun showRecovery() {
-        _currentLayout = R.layout.activity_login_recovery
-        setContentView(_currentLayout)
+        _currLayout = R.layout.activity_login_recovery
+        setContentView(_currLayout)
         _userRecovery.initOperations()
     }
 
     fun showSignUp() {
-        _currentLayout = R.layout.activity_signup
-        setContentView(_currentLayout)
+        _currLayout = R.layout.activity_signup
+        setContentView(_currLayout)
         _signApp.initOperations()
     }
 
     fun showLogin(isInit : Boolean = false) {
-        _currentLayout = R.layout.activity_login
-        setContentView(_currentLayout)
+        _currLayout = R.layout.activity_login
+        setContentView(_currLayout)
         findViewById<EditText>(R.id.text_welcome_email).requestFocus()
         if(isInit) {
-            _appAuth.initOperations()
-            _googleAccount.initOperations()
+            _aAuth.initOperations()
+            _gAcct.initOperations()
         }
     }
 
@@ -76,16 +76,18 @@ class StartActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == _googleAccount.getReqCode()) {
-            _googleAccount.handleResults(data)
-            _firebaseAuth.connectByGoogleAcct(_googleAccount.getGoogleResult().signInAccount!!)
-            _userData = _googleAccount.getUserData()
+        if(requestCode == _gAcct.getReqCode()) {
+            _gAcct.handleResults(data)
+            _fbAuth.connectByGoogleAcct(_gAcct.getGoogleResult().signInAccount!!)
+            _userData = _gAcct.getUserData()
             writeProfileOnTransaction()
-        } else if(requestCode == _appAuth.getReqCode()) {
-            _appAuth.handleResults(data)
-            _userData = _appAuth.getUserData()
+        } else if(requestCode == _aAuth.getReqCode()) {
+            _aAuth.handleResults(data)
+            _userData = _aAuth.getUserData()
             if(_userData.containsKey("email") && _userData.containsKey("password")) {
-                _firebaseAuth.connectByAppAcct(_userData["email"].toString(), _userData["password"].toString())
+                _fbAuth.connectByAppAcct(_userData["email"].toString(), _userData["password"].toString())
+                findViewById<EditText>(R.id.text_welcome_email).setText(_userData["email"])
+                findViewById<EditText>(R.id.text_welcome_password).setText(_userData["password"])
                 writeProfileOnTransaction()
             }
         } else if(requestCode == _signApp.getReqCode() || requestCode == _signApp.getReqGalCode() || requestCode == _signApp.getReqCamCode()) {
@@ -93,10 +95,13 @@ class StartActivity : AppCompatActivity() {
             if(requestCode != _signApp.getReqCode()) { return }
             _userData = _signApp.getUserData()
             if(_userData.containsKey("email") && _userData.containsKey("password")) {
-                // TODO: put user email and password into fields and try to login for him automatically
+                showLogin()
+                findViewById<EditText>(R.id.text_welcome_email).setText(_userData["email"])
+                findViewById<EditText>(R.id.text_welcome_password).setText(_userData["password"])
+                writeProfileOnTransaction()
             }
         } else if(requestCode == _userRecovery.getReqCode()) {
-            // TODO: handle in somewhat way
+            Toast.makeText(this, "waiting to recovery email...", Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(this, "Some connection error was occur, try again.", Toast.LENGTH_LONG).show()
         }
@@ -104,8 +109,7 @@ class StartActivity : AppCompatActivity() {
 
     private fun writeProfileOnTransaction() {
         Toast.makeText(this, "Successfully Signed-In!", Toast.LENGTH_LONG).show()
-        _firebaseDb.writeUser(_userData["email"].toString(), _userData)
-        _userData.remove("email")
+        _fbDb.writeUser(_userData["email"].toString(), _userData)
         userProfileActivityOnStart(User(_userData))
     }
 

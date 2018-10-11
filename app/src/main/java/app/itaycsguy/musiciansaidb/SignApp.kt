@@ -8,6 +8,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -22,12 +24,12 @@ import java.util.*
 import kotlin.collections.HashMap
 
 
-class SignApp(act : AppCompatActivity, fbDb : FirebaseDB) : AppCompatActivity() {
+class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),TextWatcher {
     private val REQUEST_CODE = 2
     private val GALLERY = 3
     private val CAMERA = 4
     private val _act : StartActivity = act as StartActivity
-    private val _firebaseDB : FirebaseDB = fbDb
+    private val _fbDb : FirebaseDB = fbDb
     private lateinit var _signUpBtn : Button
     private var _imageView: ImageView? = null
     private lateinit var _photoPath : Uri
@@ -37,6 +39,13 @@ class SignApp(act : AppCompatActivity, fbDb : FirebaseDB) : AppCompatActivity() 
     }
 
     fun initOperations() {
+        _act.findViewById<EditText>(R.id.registiration_email).addTextChangedListener(this)
+        _act.findViewById<EditText>(R.id.registiration_givenname).addTextChangedListener(this)
+        _act.findViewById<EditText>(R.id.registiration_family_name).addTextChangedListener(this)
+        _act.findViewById<EditText>(R.id.registiration_username).addTextChangedListener(this)
+        _act.findViewById<EditText>(R.id.registiration_password).addTextChangedListener(this)
+        _act.findViewById<EditText>(R.id.registiration_confirm_password).addTextChangedListener(this)
+
         _act.findViewById<EditText>(R.id.registiration_email).requestFocus()
         _signUpBtn = _act.findViewById(R.id.registiration_signup_button)
         _signUpBtn.setOnClickListener {
@@ -49,7 +58,7 @@ class SignApp(act : AppCompatActivity, fbDb : FirebaseDB) : AppCompatActivity() 
             val isValid : Boolean = isValidPassword(password) && isCorrectEmailFormat(email)
             if (!isValid) { Toast.makeText(_act, "Invalid provided details.", Toast.LENGTH_LONG).show() }
             else {
-                _firebaseDB.getRef()!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                _fbDb.getRef()!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(p0: DataSnapshot) {
                         if(!p0.exists()) {
                             Toast.makeText(_act, "Registered!", Toast.LENGTH_LONG).show()
@@ -77,6 +86,17 @@ class SignApp(act : AppCompatActivity, fbDb : FirebaseDB) : AppCompatActivity() 
         _act.findViewById<Button>(R.id.registiration_cancel_button).setOnClickListener { _act.showLogin() }
         this._imageView = ImageView(_act)
     }
+
+    override fun afterTextChanged(p0: Editable?) {
+        p0?.let {
+            // check spelling
+            Toast.makeText(_act, p0, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    // not relevant but exist
+    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     fun getUserData() : HashMap<String,String> {
         return _signUpResult
