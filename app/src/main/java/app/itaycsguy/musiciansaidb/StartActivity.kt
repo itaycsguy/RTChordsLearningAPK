@@ -4,8 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.EditText
-import android.widget.Toast
-
+import android.graphics.Color
 
 class StartActivity : AppCompatActivity() {
     private var _currLayout : Int = R.layout.activity_login
@@ -27,7 +26,7 @@ class StartActivity : AppCompatActivity() {
         _aAuth = AppAuth(this, _fbDb)
         _signApp = SignApp(this,_fbDb)
         _userRecovery = UserRecovery(this,_fbAuth)
-        showLogin(isInit = true)
+        showLogin()
     }
 
     override fun onStart() {
@@ -45,7 +44,6 @@ class StartActivity : AppCompatActivity() {
             finish()
             startActivity(intent)
         }
-        Toast.makeText(this,"onBackPressed",Toast.LENGTH_LONG).show()
     }
 
     fun showRecovery() {
@@ -60,14 +58,16 @@ class StartActivity : AppCompatActivity() {
         _signApp.initOperations()
     }
 
-    fun showLogin(isInit : Boolean = false) {
+    fun showLogin() {
         _currLayout = R.layout.activity_login
         setContentView(_currLayout)
-        findViewById<EditText>(R.id.text_welcome_email).requestFocus()
-        if(isInit) {
-            _aAuth.initOperations()
-            _gAcct.initOperations()
-        }
+        val email = findViewById<EditText>(R.id.text_welcome_email)
+        email.requestFocus()
+        email.setBackgroundColor(Color.WHITE)
+        val password = findViewById<EditText>(R.id.text_welcome_password)
+        password.setBackgroundColor(Color.WHITE)
+        _aAuth.initOperations()
+        _gAcct.initOperations()
     }
 
     fun onActivityResultWrapper(reqCode : Int,data : Intent) {
@@ -101,20 +101,19 @@ class StartActivity : AppCompatActivity() {
                 writeProfileOnTransaction()
             }
         } else if(requestCode == _userRecovery.getReqCode()) {
-            Toast.makeText(this, "waiting to recovery email...", Toast.LENGTH_LONG).show()
+            CustomSnackBar.make(this, "Waiting to recovery email...")
         } else {
-            Toast.makeText(this, "Some connection error was occur, try again.", Toast.LENGTH_LONG).show()
+            CustomSnackBar.make(this, "Some connection error was occur, try again.")
         }
     }
 
     private fun writeProfileOnTransaction() {
-        Toast.makeText(this, "Successfully Signed-In!", Toast.LENGTH_LONG).show()
+        CustomSnackBar.make(this, "Successfully Signed-In!")
         _fbDb.writeUser(_userData["email"].toString(), _userData)
         userProfileActivityOnStart(User(_userData))
     }
 
     fun userProfileActivityOnStart(user : User){
-        Toast.makeText(this, "goto profile activity", Toast.LENGTH_LONG).show()
         val intent = Intent(this, ProfileActivity::class.java)
         intent.putExtra("user",user.getHashDetails())
         startActivity(intent)

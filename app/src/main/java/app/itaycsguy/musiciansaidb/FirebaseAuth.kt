@@ -29,8 +29,9 @@ class FirebaseAuth(act : AppCompatActivity) {
     fun connectByAppAcct(email : String, password: String) {
         this._fbAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(_act as Activity){
             task ->
-            if (task.isSuccessful) { Toast.makeText(_act, "Successfully Logged in!", Toast.LENGTH_LONG).show() }
-            else { Toast.makeText(_act, "Error in the Logging in action.", Toast.LENGTH_SHORT).show() } }
+            if (task.isSuccessful) {  CustomSnackBar.make(_act,  "Successfully Logged-in!") }
+            else { CustomSnackBar.make(_act,  "Error in Login action.") }
+        }
     }
 
     fun disconnect() {

@@ -1,8 +1,10 @@
 package app.itaycsguy.musiciansaidb
 
+import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.view.inputmethod.InputMethodManager
 import java.io.*
 
 
@@ -80,4 +82,9 @@ fun isCorrectEmailFormat(email: String): Boolean {
     val match : MatchResult? = pattern.toRegex(setOf(RegexOption.IGNORE_CASE,RegexOption.DOT_MATCHES_ALL)).find(email)
     match?.let { return true }
     return false
+}
+
+fun hideKeyboard(act : Activity) {
+    val imm = act.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(act.currentFocus.windowToken, 0)
 }
