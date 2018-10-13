@@ -6,7 +6,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -23,6 +22,7 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
         _act.findViewById<TextView>(R.id.text_welcome_password).addTextChangedListener(this)
 
         _act.findViewById<Button>(R.id.sign_in_welcome_button).setOnClickListener {
+            hideKeyboard(_act)
             val email =_act.findViewById<TextView>(R.id.text_welcome_email).text.toString()
             val password = _act.findViewById<TextView>(R.id.text_welcome_password).text.toString()
             validOnStart(email, password)
@@ -31,14 +31,8 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
         (_act.findViewById<Button>(R.id.forgot_welcome_button)).setOnClickListener { _act.showRecovery() }
     }
 
-    override fun afterTextChanged(p0: Editable?) {
-        p0?.let {
-            // check spelling
-            Toast.makeText(_act, p0, Toast.LENGTH_LONG).show()
-        }
-    }
-
     // not relevant but exist
+    override fun afterTextChanged(p0: Editable?) { p0?.let {} }
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
@@ -54,7 +48,7 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
         if(isCorrectEmailFormat(email) && isValidPassword(password)) {
             checkExistAccount(email,password)
         } else {
-            Toast.makeText(_act, "Invalid email/password that provided.", Toast.LENGTH_LONG).show()
+            CustomSnackBar.make(_act,  "Invalid Details are provided!")
         }
     }
 
@@ -76,10 +70,10 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
                         intent.putExtra("data",map)
                         _act.onActivityResultWrapper(REQUEST_CODE,intent)
                     }
-                } else { Toast.makeText(_act, "The account does not exist!", Toast.LENGTH_LONG).show() }
+                } else { CustomSnackBar.make(_act,  "Account does not exist!") }
             }
 
-            override fun onCancelled(p0: DatabaseError) { Toast.makeText(_act, "Data corruption!", Toast.LENGTH_LONG).show() }
+            override fun onCancelled(p0: DatabaseError) { CustomSnackBar.make(_act,  "Data corruption!") }
         })
     }
 

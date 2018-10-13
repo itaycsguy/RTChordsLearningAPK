@@ -13,7 +13,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 
 
 class GoogleAuth(act : AppCompatActivity) : GoogleApiClient.OnConnectionFailedListener {
-    private val REQUEST_CODE = 1
+    private val REQUESTCODE = 1
     private val _act : AppCompatActivity = act
     private val _signInOptions : GoogleSignInOptions
     private val _googleApiClient : GoogleApiClient
@@ -42,7 +42,7 @@ class GoogleAuth(act : AppCompatActivity) : GoogleApiClient.OnConnectionFailedLi
     }
 
     fun getReqCode() : Int {
-        return REQUEST_CODE
+        return REQUESTCODE
     }
 
     fun getGoogleResult() : GoogleSignInResult {
@@ -51,7 +51,7 @@ class GoogleAuth(act : AppCompatActivity) : GoogleApiClient.OnConnectionFailedLi
 
     private fun signIn() {
         val indent = Auth.GoogleSignInApi.getSignInIntent(_googleApiClient)
-        _act.startActivityForResult(indent,REQUEST_CODE)
+        _act.startActivityForResult(indent,REQUESTCODE)
     }
 
     fun handleResults(data : Intent?) {
@@ -71,5 +71,5 @@ class GoogleAuth(act : AppCompatActivity) : GoogleApiClient.OnConnectionFailedLi
         }
     }
 
-    override fun onConnectionFailed(p0: ConnectionResult) { Toast.makeText(_act, "Google connecting tunnel is corrupted!", Toast.LENGTH_LONG).show() }
+    override fun onConnectionFailed(p0: ConnectionResult) { CustomSnackBar.make(_act,"Google connecting tunnel is corrupted!") }
 }
