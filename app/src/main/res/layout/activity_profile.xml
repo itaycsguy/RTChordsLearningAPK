@@ -14,7 +14,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/background1"
+    android:background="@color/common_google_signin_btn_text_dark_disabled"
     tools:context="app.itaycsguy.musiciansaidb.ProfileActivity">
 
     <ImageView
@@ -34,12 +34,13 @@
 
     <TextView
         android:id="@+id/profile_username"
-        android:layout_width="245dp"
-        android:layout_height="20dp"
-        android:layout_marginBottom="324dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="276dp"
+        android:layout_height="23dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="292dp"
+        android:background="#CCFFFFFF"
         android:fontFamily="serif"
         android:gravity="left"
         android:text="User Name:"
@@ -49,16 +50,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/my_profile_photo"
-        app:layout_constraintVertical_bias="0.445" />
+        app:layout_constraintVertical_bias="0.793" />
 
     <TextView
         android:id="@+id/profile_email"
-        android:layout_width="245dp"
-        android:layout_height="20dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="276dp"
+        android:layout_height="23dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="248dp"
+        android:background="#CCFFFFFF"
         android:fontFamily="serif"
         android:gravity="left"
         android:text="Email:"
@@ -68,68 +70,34 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_username"
-        app:layout_constraintVertical_bias="0.014" />
+        app:layout_constraintVertical_bias="0.263" />
 
     <TextView
         android:id="@+id/my_profile_view"
         android:layout_width="196dp"
         android:layout_height="44dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="8dp"
+        android:background="#CCFFFFFF"
         android:fontFamily="serif"
         android:gravity="center_horizontal"
         android:text="My Profile"
         android:textColor="@color/colorPrimary"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/continue_profile_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="serif"
-        android:gravity="center_horizontal"
-        android:text="Continue"
-        android:textColor="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/sign_out_profile_button"
-        app:layout_constraintHorizontal_bias="0.581"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.779" />
-
-    <Button
-        android:id="@+id/sign_out_profile_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="80dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="serif"
-        android:gravity="center_horizontal"
-        android:text="Sign-Out"
-        android:textColor="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.781" />
-
     <TextView
         android:id="@+id/profile_permission"
-        android:layout_width="245dp"
-        android:layout_height="20dp"
-        android:layout_marginBottom="216dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="276dp"
+        android:layout_height="23dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="128dp"
+        android:background="#CCFFFFFF"
         android:fontFamily="serif"
         android:gravity="left"
         android:text="Permission:"
@@ -139,14 +107,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_familyname"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.192" />
 
     <TextView
         android:id="@+id/profile_givenname"
-        android:layout_width="245dp"
-        android:layout_height="20dp"
-        android:layout_marginBottom="244dp"
+        android:layout_width="276dp"
+        android:layout_height="23dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="208dp"
+        android:background="#CCFFFFFF"
         android:fontFamily="serif"
         android:gravity="left"
         android:text="Given Name:"
@@ -156,14 +125,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_email"
-        app:layout_constraintVertical_bias="0.05" />
+        app:layout_constraintVertical_bias="0.166" />
 
     <TextView
         android:id="@+id/profile_familyname"
-        android:layout_width="245dp"
-        android:layout_height="20dp"
-        android:layout_marginBottom="8dp"
+        android:layout_width="276dp"
+        android:layout_height="23dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="168dp"
+        android:background="#CCFFFFFF"
         android:fontFamily="serif"
         android:gravity="left"
         android:text="Family Name:"
@@ -173,7 +143,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_givenname"
-        app:layout_constraintVertical_bias="0.007" />
+        app:layout_constraintVertical_bias="0.23" />
 
 </android.support.constraint.ConstraintLayout>
 </LinearLayout>
