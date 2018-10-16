@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.support.v7.app.AlertDialog
@@ -23,12 +22,12 @@ import java.util.*
 import kotlin.collections.HashMap
 
 
-class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity() {
+class SignApp(act : AppCompatActivity, fbDb : FirebaseDB) : AppCompatActivity() {
     private val REQUEST_CODE = 2
     private val GALLERY = 3
     private val CAMERA = 4
     private val _act : StartActivity = act as StartActivity
-    private val _fbDb : FirebaseDB = fbDb
+    private val _firebaseDB : FirebaseDB = fbDb
     private lateinit var _signUpBtn : Button
     private var _imageView: ImageView? = null
     private lateinit var _photoPath : Uri
@@ -50,7 +49,7 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity() {
             val isValid : Boolean = isValidPassword(password) && isCorrectEmailFormat(email)
             if (!isValid) { Toast.makeText(_act, "Invalid provided details.", Toast.LENGTH_LONG).show() }
             else {
-                _fbDb.getRef()!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                _firebaseDB.getRef()!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(p0: DataSnapshot) {
                         if(!p0.exists()) {
                             Toast.makeText(_act, "Registered!", Toast.LENGTH_LONG).show()

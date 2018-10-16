@@ -2,13 +2,18 @@ package app.itaycsguy.musiciansaidb
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.graphics.Path
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
+import android.os.SystemClock.sleep
 import android.provider.MediaStore
+import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -17,22 +22,37 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
+import com.yalantis.ucrop.UCrop
+import eu.janmuller.android.simplecropimage.CropImage
 import java.io.File
+import java.lang.Exception
+import java.util.*
 
 @SuppressLint("ByteOrderMark", "Registered")
 class MenuActivity() : AppCompatActivity(), Parcelable {
     /*
     Variables of the activity
      */
-    private lateinit var imageView : ImageView
+    private lateinit var currentImage : ImageView
     private lateinit var cordinatorView : View
+    private lateinit var _user : User
+
+    //Firebase
+    private lateinit var _firebaseStorage : FirebaseStorage
+    private lateinit var _storageReference : StorageReference
+    private val _firebaseDB : FirebaseDB = FirebaseDB()
+
     lateinit var toolbar : Toolbar
     lateinit var uploadButton : ImageButton
 
     lateinit var file : File
+    private var mFileTemp: File? = null
     private lateinit var cropIntent : Intent
 
     /*
@@ -42,20 +62,32 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     private val TAG = "Permissions"
     private val REQUEST_IMAGE_CAPTURE = 0
     private val REQUEST_PERMISSION_CODE = 2
-    private val REQUEST_CROP_CODE = 1
+    private val TEMP_PHOTO_FILE_NAME = "temp_photo.jpg"
 
     private var uri: Uri? = null
     private lateinit var takePictureIntent: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //Firebase Init:
+        _firebaseStorage = FirebaseStorage.getInstance()
+        _storageReference = _firebaseStorage.reference
+
+        //Get user data from Start Activity
+        _user = User(intent.getSerializableExtra("user") as HashMap<String,String>)
+        Toast.makeText(this, "Logged in as ${_user.getUserName()}.", Toast.LENGTH_SHORT).show()
+
+        // Setting temp file for cropping to external storage dir
+        mFileTemp = File(Environment.getExternalStorageDirectory(), TEMP_PHOTO_FILE_NAME)
+
+        setTempFile()
 
         val builder = StrictMode.VmPolicy.Builder()
         StrictMode.setVmPolicy(builder.build())
         setContentView(R.layout.menu_activity)
         cordinatorView = findViewById(R.id.myCoordinatorLayout)
         uploadButton = findViewById(R.id.UploadButton)
-        imageView = findViewById(R.id.UploadedView)
+        currentImage = findViewById(R.id.UploadedView)
         toolbar = findViewById(R.id.toolbar)
         toolbar.title = ("Choose Operation")
         setSupportActionBar(toolbar)
@@ -72,6 +104,28 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
             makeRequest()
         }
 
+
+        uploadButton.setOnClickListener {
+            uploadImage()
+            val infoText: String = if (_user.getPermission() == "anonymous"){
+                "The Image is pending for approval before entering our database, thanks for your support"
+            } else {
+                //TODO: change the user's permission to be an enum with the different permissions and address them all here.
+                "The Image is automatically approved since you possess the right permission level"
+            }
+            Toast.makeText(this, infoText, Toast.LENGTH_LONG).show()
+        }
+
+    }
+
+    private fun setTempFile() {
+        //Taken from simple crop image api example.
+        val state = Environment.getExternalStorageState()
+        mFileTemp = if (Environment.MEDIA_MOUNTED == state) {
+            File(Environment.getExternalStorageDirectory(), TEMP_PHOTO_FILE_NAME)
+        } else {
+            File(filesDir, TEMP_PHOTO_FILE_NAME)
+        }
     }
 
     private fun makeRequest() {
@@ -87,9 +141,9 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
 
 
     constructor(parcel: Parcel) : this() {
-        cropIntent = parcel.readParcelable(Intent::class.java.classLoader)
+        cropIntent = parcel.readParcelable(Intent::class.java.classLoader)!!
         uri = parcel.readParcelable(Uri::class.java.classLoader)
-        takePictureIntent = parcel.readParcelable(Intent::class.java.classLoader)
+        takePictureIntent = parcel.readParcelable(Intent::class.java.classLoader)!!
     }
 
     override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?){
@@ -100,7 +154,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
                 if (uri != null) {
                     val path = getImagePathFromInputStreamUri(this, uri!!)
                     uri = Uri.fromFile(File(path))
-                    imageView.setImageURI(uri)
+                    currentImage.setImageURI(uri)
                 }
             }
             REQUEST_IMAGE_CAPTURE -> {
@@ -110,19 +164,17 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
                     }
                 }
             }
-            REQUEST_CROP_CODE -> {
-                if (data?.data != null) {
-                    uri = data?.data
-                    // Forcing a refresh of the imageView by changing the image.
-                    imageView.setImageResource(R.drawable.ic_gallery)
+            UCrop.REQUEST_CROP -> {
+                if (resultCode == RESULT_OK) {
+                    uri = UCrop.getOutput(data!!)
+                    // Forcing a refresh of the currentImage by changing the image.
+                    currentImage.setImageResource(R.drawable.ic_gallery)
                     MediaScannerConnection.scanFile(this, listOf(uri?.path).toTypedArray(), listOf("image/jpeg").toTypedArray(), null)
-                    imageView.setImageURI(uri)
-                }
-                else {
-                    Toast.makeText(this, "Crop not done, no change needed.", Toast.LENGTH_SHORT).show()
+                    currentImage.setImageURI(uri)
+                } else if (resultCode == UCrop.RESULT_ERROR) {
+                    throw UCrop.getError(data!!)!!
                 }
             }
-
         }
 
     }
@@ -131,6 +183,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         item?.let {
@@ -143,23 +196,48 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         return true
     }
 
-    private fun openCrop() {
+    private fun uploadImage() {
+        if (uri != null){
+            //TODO: find a legit replacement to wokr like the progress dialog since it is deprecated.
+//            val progressDialog = ProgressDialog(this)
+//            progressDialog.setTitle("Uploading...")
+//            progressDialog.show()
+            val layout : RelativeLayout = findViewById(R.id.MenuView)
+            val progressBar = ProgressBar(this, null, android.R.attr.progressBarStyleLarge)
+            val params = RelativeLayout.LayoutParams(300,300)
+            params.addRule(RelativeLayout.CENTER_HORIZONTAL)
+            layout.addView(progressBar, params)
+            progressBar.visibility = View.VISIBLE  //To show ProgressBar
+//           progressBar.visibility = View.GONE     // To Hide ProgressBar
+            val database : String = if (_user.getPermission() == "anonymous") "temp_images" else "verified_images"
+            val ref = _storageReference.child(
+                    "Images_Database/" +
+                            "$database/" +
+                            "${_user.getUserName()}_${UUID.randomUUID()}")
+            ref.putFile(uri!!)
+                    .addOnSuccessListener {
+                        progressBar.visibility = View.GONE     // To Hide ProgressBar
+                    }
+                    .addOnFailureListener{
+                        Toast.makeText(this, "Failed to Upload", Toast.LENGTH_SHORT).show()
+
+                    }
+                    .addOnProgressListener{
+                        progressBar.progress = (100.0*it.bytesTransferred/it.totalByteCount).toInt()
+                    }
+        }
+    }
+
+    private fun openCrop(){
         try {
             //First we check if there was a picture picked and the wanted crop isn't on the filler.
             if (uri == null) {
               Toast.makeText(this,"In order to crop you need to first pick a picture", Toast.LENGTH_SHORT).show()
             }
             else {
-                cropIntent = Intent("com.android.camera.action.CROP")
-                cropIntent.setDataAndType(uri, "image/*")
-                cropIntent.putExtra("crop", "true")
-                cropIntent.putExtra("scaleUpIfNeeded", "true")
-                cropIntent.putExtra("outputX", "180")
-                cropIntent.putExtra("aspectX", "3")
-                cropIntent.putExtra("aspectY", "4")
-                cropIntent.putExtra("outputY", "180")
-                cropIntent.putExtra("return-data", "true")
-                startActivityForResult(cropIntent, REQUEST_CROP_CODE)
+                UCrop.of(uri!!, uri!!)
+                        .withAspectRatio(16.toFloat(), 9.toFloat())
+                        .start(this)
             }
         }
         catch (exception : ActivityNotFoundException){
@@ -171,7 +249,8 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         file = File(Environment.getExternalStorageDirectory(),
                 "chord_${System.currentTimeMillis()}.jpg")
-        uri = Uri.fromFile(file)
+
+        imageChanged(file)
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
         takePictureIntent.putExtra("return-data", true)
         takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -216,5 +295,9 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         override fun newArray(size: Int): Array<MenuActivity?> {
             return arrayOfNulls(size)
         }
+    }
+
+    private fun imageChanged(file: File){
+        uri = Uri.fromFile(file)
     }
 }

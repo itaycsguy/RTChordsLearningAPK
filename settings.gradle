@@ -1,1 +1,2 @@
-include ':app'
+include ':app', ':simple-crop-image-lib'
+project(':simple-crop-image-lib').projectDir = new File('app/src/main/libs/cropimage-master/simple-crop-image-lib')

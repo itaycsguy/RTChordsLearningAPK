@@ -8,11 +8,11 @@ import android.widget.Toast
 
 
 class StartActivity : AppCompatActivity() {
-    private var _currLayout : Int = R.layout.activity_login
-    private lateinit var _fbAuth : FirebaseAuth
-    private lateinit var _fbDb : FirebaseDB
-    private lateinit var _gAcct : GoogleAuth
-    private lateinit var _aAuth : AppAuth
+    private var _currentLayout : Int = R.layout.activity_login
+    private lateinit var _firebaseAuth : FirebaseAuth
+    private lateinit var _firebaseDb : FirebaseDB
+    private lateinit var _googleAccount : GoogleAuth
+    private lateinit var _appAuth : AppAuth
     private lateinit var _signApp : SignApp
     private lateinit var _userRecovery : UserRecovery
     private lateinit var _userData : HashMap<String,String>
@@ -20,12 +20,12 @@ class StartActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(_currLayout)
-        _fbAuth = FirebaseAuth(this)
-        _fbDb = FirebaseDB()
-        _gAcct = GoogleAuth(this)
-        _aAuth = AppAuth(this, _fbDb)
-        _signApp = SignApp(this,_fbDb)
+        setContentView(_currentLayout)
+        _firebaseAuth = FirebaseAuth(this)
+        _firebaseDb = FirebaseDB()
+        _googleAccount = GoogleAuth(this)
+        _appAuth = AppAuth(this, _firebaseDb)
+        _signApp = SignApp(this,_firebaseDb)
         _userRecovery = UserRecovery(this)
         showLogin(isInit = true)
     }
@@ -33,13 +33,13 @@ class StartActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         if(intent.hasExtra("email") && intent.hasExtra("password")){
-            _aAuth.validOnStart(intent.getStringExtra("email"),intent.getStringExtra("password"))
+            _appAuth.validOnStart(intent.getStringExtra("email"),intent.getStringExtra("password"))
         }
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        if(_currLayout != R.layout.activity_login) {
+        if(_currentLayout != R.layout.activity_login) {
             showLogin()
         } else {
             finish()
@@ -49,24 +49,24 @@ class StartActivity : AppCompatActivity() {
     }
 
     fun showRecovery() {
-        _currLayout = R.layout.activity_login_recovery
-        setContentView(_currLayout)
+        _currentLayout = R.layout.activity_login_recovery
+        setContentView(_currentLayout)
         _userRecovery.initOperations()
     }
 
     fun showSignUp() {
-        _currLayout = R.layout.activity_signup
-        setContentView(_currLayout)
+        _currentLayout = R.layout.activity_signup
+        setContentView(_currentLayout)
         _signApp.initOperations()
     }
 
     fun showLogin(isInit : Boolean = false) {
-        _currLayout = R.layout.activity_login
-        setContentView(_currLayout)
+        _currentLayout = R.layout.activity_login
+        setContentView(_currentLayout)
         findViewById<EditText>(R.id.text_welcome_email).requestFocus()
         if(isInit) {
-            _aAuth.initOperations()
-            _gAcct.initOperations()
+            _appAuth.initOperations()
+            _googleAccount.initOperations()
         }
     }
 
@@ -76,16 +76,16 @@ class StartActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == _gAcct.getReqCode()) {
-            _gAcct.handleResults(data)
-            _fbAuth.connectByGoogleAcct(_gAcct.getGoogleResult().signInAccount!!)
-            _userData = _gAcct.getUserData()
+        if(requestCode == _googleAccount.getReqCode()) {
+            _googleAccount.handleResults(data)
+            _firebaseAuth.connectByGoogleAcct(_googleAccount.getGoogleResult().signInAccount!!)
+            _userData = _googleAccount.getUserData()
             writeProfileOnTransaction()
-        } else if(requestCode == _aAuth.getReqCode()) {
-            _aAuth.handleResults(data)
-            _userData = _aAuth.getUserData()
+        } else if(requestCode == _appAuth.getReqCode()) {
+            _appAuth.handleResults(data)
+            _userData = _appAuth.getUserData()
             if(_userData.containsKey("email") && _userData.containsKey("password")) {
-                _fbAuth.connectByAppAcct(_userData["email"].toString(), _userData["password"].toString())
+                _firebaseAuth.connectByAppAcct(_userData["email"].toString(), _userData["password"].toString())
                 writeProfileOnTransaction()
             }
         } else if(requestCode == _signApp.getReqCode() || requestCode == _signApp.getReqGalCode() || requestCode == _signApp.getReqCamCode()) {
@@ -104,7 +104,7 @@ class StartActivity : AppCompatActivity() {
 
     private fun writeProfileOnTransaction() {
         Toast.makeText(this, "Successfully Signed-In!", Toast.LENGTH_LONG).show()
-        _fbDb.writeUser(_userData["email"].toString(), _userData)
+        _firebaseDb.writeUser(_userData["email"].toString(), _userData)
         _userData.remove("email")
         userProfileActivityOnStart(User(_userData))
     }
