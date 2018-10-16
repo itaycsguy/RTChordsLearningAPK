@@ -1,15 +1,12 @@
 package app.itaycsguy.musiciansaidb
 
-import android.content.Intent
 import android.net.Uri
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
+import android.support.v4.app.FragmentActivity
 import android.widget.TextView
 
 
-class ProfileActivity : AppCompatActivity() {
-    private val _fbAuth : FirebaseAuth = FirebaseAuth(this)
+class ProfileActivity : FragmentActivity() {
     private lateinit var _user : User
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,17 +22,6 @@ class ProfileActivity : AppCompatActivity() {
         if (image != null && image != Uri.EMPTY && image != Uri.parse("null")) {
 //            findViewById<ImageView>(R.id.my_profile_photo).setImageURI(Uri.parse(_user.getPhoto()))
             // TODO: need to classify between google default photo to uploaded user photo
-        }
-        findViewById<Button>(R.id.continue_profile_button).setOnClickListener {
-            val intent = Intent(this, MenuActivity::class.java)
-            intent.putExtra("user",_user.getHashDetails())
-            startActivity(intent)
-        }
-        findViewById<Button>(R.id.sign_out_profile_button).setOnClickListener {
-            _fbAuth.disconnect()
-            val intent = Intent(this, StartActivity::class.java)
-            intent.putExtra("user",_user.getHashDetails())
-            startActivity(intent)
         }
     }
 }

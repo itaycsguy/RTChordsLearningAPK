@@ -114,7 +114,7 @@ class StartActivity : AppCompatActivity() {
     }
 
     fun userProfileActivityOnStart(user : User){
-        val intent = Intent(this, ProfileActivity::class.java)
+        val intent = Intent(this, MenuManagement::class.java)
         intent.putExtra("user",user.getHashDetails())
         startActivity(intent)
     }
