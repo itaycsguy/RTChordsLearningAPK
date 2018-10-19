@@ -37,7 +37,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".MenuActivity" />
-        <activity android:name=".MenuManagement" />
         <activity android:name=".ProfileActivity" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"

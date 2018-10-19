@@ -5,8 +5,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.EditText
 import android.graphics.Color
+import java.io.Serializable
 
-class StartActivity : AppCompatActivity() {
+class StartActivity : AppCompatActivity(), Serializable {
     private var _currLayout : Int = R.layout.activity_login
     private lateinit var _fbAuth : FirebaseAuth
     private lateinit var _fbDb : FirebaseDB
@@ -114,7 +115,7 @@ class StartActivity : AppCompatActivity() {
     }
 
     fun userProfileActivityOnStart(user : User){
-        val intent = Intent(this, MenuManagement::class.java)
+        val intent = Intent(this, ProfileActivity::class.java)
         intent.putExtra("user",user.getHashDetails())
         startActivity(intent)
     }

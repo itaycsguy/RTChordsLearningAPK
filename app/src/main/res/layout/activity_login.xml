@@ -108,7 +108,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:background="@drawable/user"
+            android:background="@drawable/sign"
             android:fontFamily="serif"
             android:gravity="center_horizontal"
             android:textColor="@color/colorPrimary"

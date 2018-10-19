@@ -1,17 +1,21 @@
 package app.itaycsguy.musiciansaidb
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
+import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
 
 
-class ProfileActivity : FragmentActivity() {
+class ProfileActivity : AppCompatActivity() {
     private lateinit var _user : User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+        setSupportActionBar(findViewById(R.id.profile_toolbar))
         _user = User(intent.getSerializableExtra("user") as HashMap<String,String>)
         findViewById<TextView>(R.id.profile_username).append(" " + _user.getUserName())
         findViewById<TextView>(R.id.profile_email).append(" " + _user.getEmail())
@@ -20,8 +24,31 @@ class ProfileActivity : FragmentActivity() {
         findViewById<TextView>(R.id.profile_permission).append(" " + _user.getPermission())
         val image = Uri.parse(_user.getPhoto())
         if (image != null && image != Uri.EMPTY && image != Uri.parse("null")) {
-//            findViewById<ImageView>(R.id.my_profile_photo).setImageURI(Uri.parse(_user.getPhoto()))
             // TODO: need to classify between google default photo to uploaded user photo
+            // findViewById<ImageView>(R.id.my_profile_photo).setImageURI(Uri.parse(_user.getPhoto()))
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_management, menu)
+        return true
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        item?.let {
+            when(item.itemId) {
+                R.id.to_operations_activity -> {
+                    val intent = Intent(this,MenuActivity::class.java)
+                    intent.putExtra("user",_user.getHashDetails())
+                    startActivity(intent)
+                }
+                R.id.action_logout -> {
+                    val intent = Intent(this,StartActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+        }
+        return true
     }
 }
