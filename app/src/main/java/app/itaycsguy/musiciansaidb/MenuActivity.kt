@@ -199,9 +199,16 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
                 item.itemId == R.id.btn_camera -> openCamera()
                 item.itemId == R.id.btn_gallery -> openGallery()
                 item.itemId == R.id.btn_crop -> openCrop()
+                item.itemId == R.id.btn_back -> backToProfile()
             }
         }
         return true
+    }
+
+    private fun backToProfile() {
+        val intent = Intent(this, ProfileActivity::class.java)
+        intent.putExtra("user",_user.getHashDetails())
+        startActivity(intent)
     }
 
 
