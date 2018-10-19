@@ -1,27 +1,20 @@
 package app.itaycsguy.musiciansaidb
 
 import android.content.Intent
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.DrawableWrapper
-import android.graphics.drawable.Icon
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.content.ContextCompat
-import android.support.v4.content.CursorLoader
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.*
-import com.bumptech.glide.util.Util
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -34,7 +27,7 @@ import kotlin.collections.HashMap
 
 
 class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),TextWatcher {
-    private val MIN_STRENGTH_PASSWORD = 0.6
+    private val MIN_STRENGTH_PASSWORD = 0.5
     private val REQUEST_CODE = 2
     private val GALLERY = 3
     private val CAMERA = 4
@@ -43,8 +36,10 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
     private lateinit var _signUpBtn : Button
     private var _imageView: ImageView? = null
     private var _photoPath : Uri? = null
+    private var _fieldMetaHash : HashMap<String,Boolean> = HashMap<String,Boolean>()
     private lateinit var _signUpResult : HashMap<String,String>
     companion object {
+        private val NUM_OF_INPUT_FIELDS = 6
         private val IMAGE_DIRECTORY = "/UserProfileImage"
     }
 
@@ -66,17 +61,20 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
         _act.findViewById<EditText>(R.id.registiration_email).requestFocus()
         _signUpBtn = _act.findViewById(R.id.registiration_signup_button)
         _signUpBtn.setOnClickListener {
-            val email = (_act.findViewById<EditText>(R.id.registiration_email)).text.toString()
-            val givenname = (_act.findViewById<EditText>(R.id.registiration_givenname)).text.toString()
-            val familyname = (_act.findViewById<EditText>(R.id.registiration_family_name)).text.toString()
-            val username = (_act.findViewById<EditText>(R.id.registiration_username)).text.toString()
-            val password = (_act.findViewById<EditText>(R.id.registiration_password)).text.toString()
-            if(     email.isNotEmpty() &&
-                    givenname.isNotEmpty() &&
-                    familyname.isNotEmpty() &&
-                    username.isNotEmpty() &&
-                    password.isNotEmpty() &&
-                    _photoPath != null) {
+            // hideKeyboard(_act) // TODO: hide keyboard returns null, cannot handle this issue right now
+            var detValue = true
+            for(value in _fieldMetaHash.values){
+                if(!value){
+                    detValue = false
+                    break
+                }
+            }
+            if(detValue && _fieldMetaHash.values.size == NUM_OF_INPUT_FIELDS && _photoPath != null) {
+                val email = (_act.findViewById<EditText>(R.id.registiration_email)).text.toString()
+                val givenname = (_act.findViewById<EditText>(R.id.registiration_givenname)).text.toString()
+                val familyname = (_act.findViewById<EditText>(R.id.registiration_family_name)).text.toString()
+                val username = (_act.findViewById<EditText>(R.id.registiration_username)).text.toString()
+                val password = (_act.findViewById<EditText>(R.id.registiration_password)).text.toString()
                 val photo = _photoPath.toString()
                 val isValid: Boolean = isValidPassword(password) && isCorrectEmailFormat(email)
                 if (!isValid) {
@@ -109,7 +107,7 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                     })
                 }
             } else {
-                CustomSnackBar.make(_act,"Some details are missing!")
+                CustomSnackBar.make(_act,"Some details are missing/invalid!")
             }
         }
         _act.findViewById<Button>(R.id.registiration_attach_photo_button).setOnClickListener { showPhotoDialog() }
@@ -119,17 +117,20 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
 
     override fun afterTextChanged(p0: Editable?) {
         p0?.let {
-            val successContent = ContextCompat.getDrawable(_act,R.drawable.success)
-            val errorContent = ContextCompat.getDrawable(_act,R.drawable.error)
+            val successContent = ContextCompat.getDrawable(_act,R.drawable.done)
+            // val errorContent = ContextCompat.getDrawable(_act,R.drawable.error)
             when(_act.currentFocus) {
                 _act.findViewById<EditText>(R.id.registiration_email) -> {
                     val email = _act.findViewById<EditText>(R.id.registiration_email)
                     if(isCorrectEmailFormat(email.text.toString())) {
                         email.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         email.setBackgroundColor(Color.parseColor("#c1e7d2"))
+                        _fieldMetaHash["email"] = true
                     } else {
-                        email.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
+                        email.error = "Invalid email address. Check you own one."
+                        // email.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         email.setBackgroundColor(Color.parseColor("#f7bfbf"))
+                        _fieldMetaHash["email"] = false
                     }
                 }
                 _act.findViewById<EditText>(R.id.registiration_givenname) -> {
@@ -137,9 +138,12 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                     if(givenname.text.toString().length > 1){
                         givenname.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         givenname.setBackgroundColor(Color.parseColor("#c1e7d2"))
+                        _fieldMetaHash["givenName"] = true
                     } else {
-                        givenname.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
+                        givenname.error = "Looks as not real name."
+                        // givenname.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         givenname.setBackgroundColor(Color.parseColor("#f7bfbf"))
+                        _fieldMetaHash["givenName"] = false
                     }
                 }
                 _act.findViewById<EditText>(R.id.registiration_family_name) -> {
@@ -147,19 +151,26 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                     if(familyname.text.toString().length > 1){
                         familyname.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         familyname.setBackgroundColor(Color.parseColor("#c1e7d2"))
+                        _fieldMetaHash["familyName"] = true
                     } else {
-                        familyname.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
+                        familyname.error = "Looks as not real name."
+                        // familyname.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         familyname.setBackgroundColor(Color.parseColor("#f7bfbf"))
+                        _fieldMetaHash["familyName"] = false
                     }
                 }
                 _act.findViewById<EditText>(R.id.registiration_username) -> {
                     val username = _act.findViewById<EditText>(R.id.registiration_username)
-                    if(username.text.toString().isNotEmpty()){
+                    val checkUsername = username.text.toString().replace("\\s".toRegex(), "")
+                    if(username.text.toString().length > 1 && username.text.toString().length == checkUsername.length){
                         username.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         username.setBackgroundColor(Color.parseColor("#c1e7d2"))
+                        _fieldMetaHash["username"] = true
                     } else {
-                        username.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
+                        username.error = "Invalid username. no spaces is required."
+                        // username.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         username.setBackgroundColor(Color.parseColor("#f7bfbf"))
+                        _fieldMetaHash["username"] = false
                     }
                 }
                 _act.findViewById<EditText>(R.id.registiration_password) -> {
@@ -169,9 +180,12 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                     if(evaluation >= MIN_STRENGTH_PASSWORD) {
                         password.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         password.setBackgroundColor(Color.parseColor("#c1e7d2"))
+                        _fieldMetaHash["password"] = true
                     } else {
-                        password.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
+                        password.error = "Invalid password. Length 10-20. Prohibit characters: ${PasswordManager.DUTY_LETTERS}"
+                        // password.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         password.setBackgroundColor(Color.parseColor("#f7bfbf"))
+                        _fieldMetaHash["password"] = false
                     }
                 }
                 _act.findViewById<EditText>(R.id.registiration_confirm_password) -> {
@@ -181,12 +195,17 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                         if(password.text.toString() == confirmPassword.text.toString()){
                             confirmPassword.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                             confirmPassword.setBackgroundColor(Color.parseColor("#c1e7d2"))
+                            _fieldMetaHash["confirmPassword"] = true
                         } else {
-                            confirmPassword.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
+                            confirmPassword.error = "Invalid password. Length 10-20. Prohibit characters: ${PasswordManager.DUTY_LETTERS}"
+                            // confirmPassword.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                             confirmPassword.setBackgroundColor(Color.parseColor("#f7bfbf"))
+                            _fieldMetaHash["confirmPassword"] = false
                         }
                     } else {
-                        password.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
+                        confirmPassword.error = "Invalid operation. Fill up the upper password/match passwords"
+                        // password.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
+                        _fieldMetaHash["confirmPassword"] = false
                     }
                 }
             }

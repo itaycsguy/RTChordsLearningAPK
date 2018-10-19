@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Environment
 import android.view.inputmethod.InputMethodManager
 import java.io.*
+import java.lang.Exception
+import java.util.regex.Pattern
 
 
 fun getImagePathFromInputStreamUri(context : Context, uri: Uri): String? {
@@ -78,10 +80,14 @@ fun isValidPassword(password: String):Boolean{
 }
 
 fun isCorrectEmailFormat(email: String): Boolean {
-    val pattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
-    val match : MatchResult? = pattern.toRegex(setOf(RegexOption.IGNORE_CASE,RegexOption.DOT_MATCHES_ALL)).find(email)
-    match?.let { return true }
-    return false
+    return Pattern.compile(
+            "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]|[\\w-]{2,}))@"
+                    + "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                    + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
+                    + "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                    + "[0-9]{1,2}|25[0-5]|2[0-4][0-9]))|"
+                    + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$"
+    ).matcher(email).matches()
 }
 
 fun hideKeyboard(act : Activity) {

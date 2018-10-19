@@ -14,6 +14,7 @@ class PasswordManager {
     //  see evaluatePassword function below
 
     companion object {
+        val DUTY_LETTERS : String = "{abcdefghijklmnopqrstuvwxyz} and {ABCDEFGHIJKLMNOPQRSTUVWXYZ} and {0123456789} and one of {@#=+!£\\$%&?}"
         val logger = Logger.getLogger(PasswordManager::class.java.name)
     }
 

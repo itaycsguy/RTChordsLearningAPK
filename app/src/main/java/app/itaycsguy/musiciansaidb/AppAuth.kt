@@ -53,7 +53,8 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
     }
 
     private fun checkExistAccount(email: String,password: String) {
-        (_fbDb.getRef())!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
+        (_fbDb.getRef())?.let {
+        it.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
                 if (p0.exists() && p0.child("authentication_vendor").value == "app") {
                     if (p0.child("password").value == password) {
@@ -74,10 +75,12 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
             }
 
             override fun onCancelled(p0: DatabaseError) { CustomSnackBar.make(_act,  "Data corruption!") }
-        })
+        }) }
     }
 
     fun handleResults(data : Intent?){
-        if(data!!.hasExtra("data")) _signInResult = data.getSerializableExtra("data") as HashMap<String, String>
+        data?.let{
+            if(data.hasExtra("data")) _signInResult = data.getSerializableExtra("data") as HashMap<String, String>
+        }
     }
 }
