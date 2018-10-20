@@ -7,6 +7,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Path
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -163,14 +164,21 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
                         openCrop()
                     }
                 }
+                else{
+                    //Reaching here means that the uri is pointing into an empty file location.
+                    uri = null
+                    currentImage.setImageResource(R.drawable.common_full_open_on_phone)
+                }
             }
             UCrop.REQUEST_CROP -> {
                 if (resultCode == RESULT_OK) {
                     uri = UCrop.getOutput(data!!)
-                    // Forcing a refresh of the currentImage by changing the image.
-                    currentImage.setImageResource(R.drawable.ic_gallery)
-                    MediaScannerConnection.scanFile(this, listOf(uri?.path).toTypedArray(), listOf("image/jpeg").toTypedArray(), null)
-                    currentImage.setImageURI(uri)
+                    if (uri != null) {
+                        // Forcing a refresh of the currentImage by changing the image.
+                        currentImage.setImageResource(R.drawable.common_full_open_on_phone)
+                        MediaScannerConnection.scanFile(this, listOf(uri?.path).toTypedArray(), listOf("image/jpeg").toTypedArray(), null)
+                        currentImage.setImageURI(uri)
+                    }
                 } else if (resultCode == UCrop.RESULT_ERROR) {
                     throw UCrop.getError(data!!)!!
                 }
@@ -196,19 +204,12 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         return true
     }
 
+
     private fun uploadImage() {
         if (uri != null){
-            //TODO: find a legit replacement to wokr like the progress dialog since it is deprecated.
-//            val progressDialog = ProgressDialog(this)
-//            progressDialog.setTitle("Uploading...")
-//            progressDialog.show()
-            val layout : RelativeLayout = findViewById(R.id.MenuView)
-            val progressBar = ProgressBar(this, null, android.R.attr.progressBarStyleLarge)
-            val params = RelativeLayout.LayoutParams(300,300)
-            params.addRule(RelativeLayout.CENTER_HORIZONTAL)
-            layout.addView(progressBar, params)
+            val progressBar : ProgressBar = findViewById(R.id.progressBar)
+            progressBar.indeterminateDrawable.setColorFilter(Color.DKGRAY, android.graphics.PorterDuff.Mode.MULTIPLY)
             progressBar.visibility = View.VISIBLE  //To show ProgressBar
-//           progressBar.visibility = View.GONE     // To Hide ProgressBar
             val database : String = if (_user.getPermission() == "anonymous") "temp_images" else "verified_images"
             val ref = _storageReference.child(
                     "Images_Database/" +

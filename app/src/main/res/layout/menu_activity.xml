@@ -48,5 +48,22 @@
             app:fabSize="normal"
             app:srcCompat="@android:drawable/ic_menu_upload" />
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:layout_width="116dp"
+            android:layout_height="133dp"
+            android:layout_alignStart="@+id/UploadedView"
+            android:layout_alignTop="@+id/UploadedView"
+            android:layout_alignEnd="@+id/UploadedView"
+            android:layout_alignBottom="@+id/UploadedView"
+            android:layout_gravity="center"
+            android:layout_marginStart="128dp"
+            android:layout_marginTop="191dp"
+            android:layout_marginEnd="140dp"
+            android:layout_marginBottom="187dp"
+            android:progressDrawable="@android:color/darker_gray"
+            android:visibility="invisible" />
+
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>
