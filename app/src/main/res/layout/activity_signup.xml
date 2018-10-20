@@ -52,6 +52,7 @@
             android:fontFamily="serif"
             android:gravity="center_horizontal"
             android:hint="Username"
+            android:textSize="@dimen/_18sdp"
             android:inputType="textPersonName"
             android:textColor="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -71,6 +72,7 @@
             android:fontFamily="serif"
             android:gravity="center_horizontal"
             android:hint="Given Name"
+            android:textSize="@dimen/_18sdp"
             android:inputType="textPersonName"
             android:textColor="@color/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
@@ -88,6 +90,7 @@
             android:ems="10"
             android:gravity="center_horizontal"
             android:hint="Email"
+            android:textSize="@dimen/_18sdp"
             android:inputType="textEmailAddress"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -107,6 +110,7 @@
             android:gravity="center_horizontal"
             android:hint="Confirm Password"
             android:inputType="textPassword"
+            android:textSize="@dimen/_18sdp"
             android:textColor="@color/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.486"
@@ -123,6 +127,7 @@
             android:fontFamily="serif"
             android:gravity="center_horizontal"
             android:hint="Password"
+            android:textSize="@dimen/_18sdp"
             android:inputType="textPassword"
             android:textColor="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -141,6 +146,7 @@
             android:background="#CCFFFFFF"
             android:ems="10"
             android:fontFamily="serif"
+            android:textSize="@dimen/_18sdp"
             android:gravity="center_horizontal"
             android:hint="Family Name"
             android:inputType="textPersonName"
@@ -155,23 +161,23 @@
 
         <Button
             android:id="@+id/registiration_signup_button"
-            android:layout_width="@dimen/_47sdp"
-            android:layout_height="@dimen/_33sdp"
+            android:layout_width="@dimen/_48sdp"
+            android:layout_height="@dimen/_37sdp"
             android:layout_marginStart="@dimen/_8sdp"
-            android:layout_marginTop="@dimen/_28sdp"
-            android:layout_marginEnd="@dimen/_32sdp"
+            android:layout_marginTop="@dimen/_6sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
             android:layout_marginBottom="@dimen/_8sdp"
             android:background="@drawable/bigger_success"
             android:fontFamily="serif"
             android:gravity="center_horizontal"
             android:textColor="@color/colorPrimary"
-            android:visibility="visible"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.673"
+            app:layout_constraintHorizontal_bias="0.514"
             app:layout_constraintStart_toEndOf="@+id/registiration_attach_photo_button"
             app:layout_constraintTop_toBottomOf="@+id/registiration_family_name"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.27" />
 
         <Button
             android:id="@+id/registiration_attach_photo_button"
@@ -187,7 +193,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/registiration_family_name"
-            app:layout_constraintVertical_bias="0.4" />
+            app:layout_constraintVertical_bias="0.0" />
 
         <Button
             android:id="@+id/registiration_cancel_button"
@@ -207,6 +213,126 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
+
+        <Button
+        android:id="@+id/signup_visible_password"
+        android:layout_width="@dimen/_25sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_16sdp"
+        android:background="@drawable/visible"
+        app:layout_constraintBottom_toBottomOf="@+id/registiration_password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.96"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/registiration_password"
+        app:layout_constraintVertical_bias="0.615" />
+
+        <Button
+            android:id="@+id/signup_visible_confirm_password"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_16sdp"
+            android:background="@drawable/visible"
+            app:layout_constraintBottom_toBottomOf="@+id/registiration_confirm_password"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.96"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/registiration_confirm_password"
+            app:layout_constraintVertical_bias="0.333" />
+
+        <TextView
+            android:id="@+id/signup_email_error"
+            style="@android:style/Widget.EditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
+            app:layout_constraintBottom_toTopOf="@+id/signup_password_error"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.052"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/signup_password_error"
+            style="@android:style/Widget.EditText"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/signup_confirm_password_error"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.054"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/signup_confirm_password_error"
+            style="@android:style/Widget.EditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/registiration_confirm_password"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.049"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.933" />
+
+        <TextView
+            android:id="@+id/signup_username_error"
+            style="@android:style/Widget.EditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.055"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.554" />
+
+        <TextView
+            android:id="@+id/signup_givenname_error"
+            style="@android:style/Widget.EditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.055"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.676" />
+
+        <TextView
+            android:id="@+id/signup_familyname_error"
+            style="@android:style/Widget.EditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.055"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.782" />
 
     </android.support.constraint.ConstraintLayout>
 </LinearLayout>

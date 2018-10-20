@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.EditText
 import android.graphics.Color
+import android.view.View
+import android.widget.ProgressBar
+import kotlinx.android.synthetic.main.menu_activity.*
 import java.io.Serializable
 
 class StartActivity : AppCompatActivity(), Serializable {
@@ -43,6 +46,7 @@ class StartActivity : AppCompatActivity(), Serializable {
             showLogin()
         } else {
             finish()
+            stopProgressBar(progressBar)
             startActivity(intent)
         }
     }

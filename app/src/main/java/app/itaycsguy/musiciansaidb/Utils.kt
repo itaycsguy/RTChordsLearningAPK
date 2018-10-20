@@ -2,9 +2,12 @@ package app.itaycsguy.musiciansaidb
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import android.os.Environment
+import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ProgressBar
 import java.io.*
 import java.lang.Exception
 import java.util.regex.Pattern
@@ -94,3 +97,15 @@ fun hideKeyboard(act : Activity) {
     val imm = act.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(act.currentFocus.windowToken, 0)
 }
+
+fun startProgressBar(act : Activity) : ProgressBar {
+    val progressBar : ProgressBar = act.findViewById(R.id.login_progressBar)
+    progressBar.indeterminateDrawable.setColorFilter(Color.DKGRAY, android.graphics.PorterDuff.Mode.MULTIPLY)
+    progressBar.visibility = View.VISIBLE  //To show ProgressBar
+    return progressBar
+}
+
+fun stopProgressBar(progressBar: ProgressBar){
+    progressBar.visibility = View.INVISIBLE  //To show ProgressBar
+}
+

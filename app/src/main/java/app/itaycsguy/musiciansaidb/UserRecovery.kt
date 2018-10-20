@@ -38,16 +38,17 @@ class UserRecovery(act : AppCompatActivity,fbAuth : FirebaseAuth) : TextWatcher 
 
     override fun afterTextChanged(p0: Editable?) {
         p0?.let {
-            val successContent = ContextCompat.getDrawable(_act,R.drawable.success)
-            val errorContent = ContextCompat.getDrawable(_act,R.drawable.error)
+            // val successContent = ContextCompat.getDrawable(_act,R.drawable.success)
+            // val errorContent = ContextCompat.getDrawable(_act,R.drawable.error)
             when(_act.currentFocus) {
                 _act.findViewById<EditText>(R.id.text_email_recovery) -> {
-                    val email = _act.findViewById<EditText>(R.id.text_email_recovery)
+                    val email = _act.findViewById<EditText>(R.id.error_view)
                     if(isCorrectEmailFormat(email.text.toString())) {
-                        email.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
+                        // email.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         email.setBackgroundColor(Color.parseColor("#c1e7d2"))
                     } else {
-                        email.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
+                        email.error = "Invalid email address."
+                        // email.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         email.setBackgroundColor(Color.parseColor("#f7bfbf"))
                     }
                 }
