@@ -37,16 +37,20 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         item?.let {
+            val progressBar = startProgressBar(this,R.id.profile_progressBar)
             when(item.itemId) {
                 R.id.to_operations_activity -> {
                     val intent = Intent(this,MenuActivity::class.java)
                     intent.putExtra("user",_user.getHashDetails())
+                    stopProgressBar(progressBar)
                     startActivity(intent)
                 }
                 R.id.action_logout -> {
                     val intent = Intent(this,StartActivity::class.java)
+                    stopProgressBar(progressBar)
                     startActivity(intent)
                 }
+                else -> { stopProgressBar(progressBar) }
             }
         }
         return true

@@ -24,6 +24,23 @@
             android:minHeight="?android:attr/actionBarSize"
             app:title="My Profile" />
 
+        <ProgressBar
+            android:id="@+id/profile_progressBar"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:layout_width="@dimen/_116sdp"
+            android:layout_height="@dimen/_133sdp"
+            android:layout_alignStart="@+id/UploadedView"
+            android:layout_alignTop="@+id/UploadedView"
+            android:layout_alignEnd="@+id/UploadedView"
+            android:layout_alignBottom="@+id/UploadedView"
+            android:layout_gravity="center"
+            android:progressDrawable="@android:color/darker_gray"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/my_profile_photo"
             android:layout_width="@dimen/_195sdp"

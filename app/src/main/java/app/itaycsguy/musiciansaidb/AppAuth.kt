@@ -73,6 +73,7 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
 
     private fun checkExistAccount(email: String,password: String) {
         (_fbDb.getRef())?.let {
+            val progressBar = startProgressBar(_act,R.id.login_progressBar)
         it.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
                 if (p0.exists() && p0.child("authentication_vendor").value == "app") {
@@ -90,7 +91,10 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
                         intent.putExtra("data",map)
                         _act.onActivityResultWrapper(REQUEST_CODE,intent)
                     }
-                } else { CustomSnackBar.make(_act,  "Account does not exist!") }
+                } else {
+                    stopProgressBar(progressBar)
+                    CustomSnackBar.make(_act,  "Account does not exist!")
+                }
             }
 
             override fun onCancelled(p0: DatabaseError) { CustomSnackBar.make(_act,  "Data corruption!") }

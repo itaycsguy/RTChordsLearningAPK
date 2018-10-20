@@ -62,8 +62,8 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
         _act.findViewById<EditText>(R.id.registiration_email).requestFocus()
         _signUpBtn = _act.findViewById(R.id.registiration_signup_button)
         _signUpBtn.setOnClickListener {
-            // val progressBar = startProgressBar(_act) // TODO: progressBar returns null, cannot handle this issue right now
-            // hideKeyboard(_act) // TODO: hide keyboard returns null, cannot handle this issue right now
+             val progressBar = startProgressBar(_act,R.id.signup_progressBar)
+             // hideKeyboard(_act) // TODO: hide keyboard returns null, cannot handle this issue right now
             var detValue = true
             for(value in _fieldMetaHash.values){
                 if(!value){
@@ -78,37 +78,34 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                 val username = (_act.findViewById<EditText>(R.id.registiration_username)).text.toString()
                 val password = (_act.findViewById<EditText>(R.id.registiration_password)).text.toString()
                 val photo = _photoPath.toString()
-                val isValid: Boolean = isValidPassword(password) && isCorrectEmailFormat(email)
-                if (!isValid) {
-                    CustomSnackBar.make(_act, "Invalid details are provided!")
-                } else {
-                    _fbDb.getRef()!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(p0: DataSnapshot) {
-                            if (!p0.exists()) {
-                                CustomSnackBar.make(_act, "Registered!")
-                                val map: HashMap<String, String> = HashMap()
-                                map["authentication_vendor"] = "app"
-                                map["user_name"] = username
-                                map["given_name"] = givenname
-                                map["family_name"] = familyname
-                                map["password"] = password
-                                map["email"] = email
-                                map["photo"] = photo
-                                map["permission"] = "anonymous"
-                                val intent = _act.intent
-                                intent.putExtra("data", map)
-                                _act.onActivityResultWrapper(REQUEST_CODE, intent)
-                            } else {
-                                CustomSnackBar.make(_act, "Account does already exist!")
-                            }
+                _fbDb.getRef()!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(p0: DataSnapshot) {
+                        if (!p0.exists()) {
+                            CustomSnackBar.make(_act, "Registered!")
+                            val map: HashMap<String, String> = HashMap()
+                            map["authentication_vendor"] = "app"
+                            map["user_name"] = username
+                            map["given_name"] = givenname
+                            map["family_name"] = familyname
+                            map["password"] = password
+                            map["email"] = email
+                            map["photo"] = photo
+                            map["permission"] = "anonymous"
+                            val intent = _act.intent
+                            intent.putExtra("data", map)
+                            _act.onActivityResultWrapper(REQUEST_CODE, intent)
+                        } else {
+                            CustomSnackBar.make(_act, "Account does already exist!")
                         }
+                    }
 
-                        override fun onCancelled(p0: DatabaseError) {
-                            CustomSnackBar.make(_act, "Data corruption!")
-                        }
-                    })
-                }
+                    override fun onCancelled(p0: DatabaseError) {
+                        stopProgressBar(progressBar)
+                        CustomSnackBar.make(_act, "Data corruption!")
+                    }
+                })
             } else {
+                stopProgressBar(progressBar)
                 CustomSnackBar.make(_act,"Some details are missing/invalid!")
             }
         }
@@ -160,7 +157,7 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                         _fieldMetaHash["email"] = true
                     } else {
                         errorSign.error = "Invalid email address."
-
+                        // email.tooltipText = errorSign.error
                         // email.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         email.setBackgroundColor(Color.parseColor("#f7bfbf"))
                         _fieldMetaHash["email"] = false
@@ -176,6 +173,7 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                         _fieldMetaHash["givenName"] = true
                     } else {
                         errorSign.error = "Looks as not real name."
+                        // givenname.tooltipText = errorSign.error
                         // givenname.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         givenname.setBackgroundColor(Color.parseColor("#f7bfbf"))
                         _fieldMetaHash["givenName"] = false
@@ -191,6 +189,7 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                         _fieldMetaHash["familyName"] = true
                     } else {
                         errorSign.error = "Looks as not real name."
+                        // familyname.tooltipText = errorSign.error
                         // familyname.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         familyname.setBackgroundColor(Color.parseColor("#f7bfbf"))
                         _fieldMetaHash["familyName"] = false
@@ -207,6 +206,7 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                         _fieldMetaHash["username"] = true
                     } else {
                         errorSign.error = "Invalid username. no spaces is required."
+                        // username.tooltipText = errorSign.error
                         // username.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         username.setBackgroundColor(Color.parseColor("#f7bfbf"))
                         _fieldMetaHash["username"] = false
@@ -224,6 +224,7 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                         _fieldMetaHash["password"] = true
                     } else {
                         errorSign.error = "Invalid password. Required characters: ${PasswordManager.DUTY_LETTERS}"
+                        // password.tooltipText = errorSign.error
                         // password.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         password.setBackgroundColor(Color.parseColor("#f7bfbf"))
                         _fieldMetaHash["password"] = false
@@ -241,12 +242,14 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                             _fieldMetaHash["confirmPassword"] = true
                         } else {
                             errorSign.error = "Invalid password. Required characters: ${PasswordManager.DUTY_LETTERS}"
+                            // confirmPassword.tooltipText = errorSign.error
                             // confirmPassword.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                             confirmPassword.setBackgroundColor(Color.parseColor("#f7bfbf"))
                             _fieldMetaHash["confirmPassword"] = false
                         }
                     } else {
                         errorSign.error = "Invalid operation. Fill up the upper password/match passwords"
+                        // confirmPassword.tooltipText = errorSign.error
                         // password.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         _fieldMetaHash["confirmPassword"] = false
                     }

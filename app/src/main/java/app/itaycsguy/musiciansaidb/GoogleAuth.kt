@@ -34,7 +34,10 @@ class GoogleAuth(act : AppCompatActivity) : GoogleApiClient.OnConnectionFailedLi
 
     fun initOperations() {
         _gBtn = _act.findViewById(R.id.google_sign_in_welcome_button)
-        _gBtn.setOnClickListener { signIn() }
+        _gBtn.setOnClickListener {
+            val progressBar = startProgressBar(_act,R.id.login_progressBar)
+            signIn()
+        }
     }
 
     fun getUserData() : HashMap<String,String> {
