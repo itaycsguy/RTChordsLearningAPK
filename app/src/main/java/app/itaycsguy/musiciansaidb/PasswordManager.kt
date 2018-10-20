@@ -9,12 +9,12 @@ class PasswordManager {
     val uppercaseLetters : String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     val numbers : String = "0123456789"
     val special : String = "@#=+!£$%&?"
-    val maxPasswordLength : Float = 20F //Max password lenght that my app creates
-    val maxPasswordFactor : Float = 10F //Max password factor based on chars inside password
+     val maxPasswordLength : Float = 20F //Max password lenght that my app creates
+     val maxPasswordFactor : Float = 6F //Max password factor based on chars inside password
     //  see evaluatePassword function below
 
     companion object {
-        val DUTY_LETTERS : String = "{abcdefghijklmnopqrstuvwxyz} and {ABCDEFGHIJKLMNOPQRSTUVWXYZ} and {0123456789} and one of {@#=+!£\\$%&?}"
+        val DUTY_LETTERS : String = "[Length of 6-20],[a-z],[A-Z],[0-9],[@#=+!£\\$%&?]"
         val logger = Logger.getLogger(PasswordManager::class.java.name)
     }
 

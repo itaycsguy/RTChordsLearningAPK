@@ -27,7 +27,7 @@ import kotlin.collections.HashMap
 
 
 class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),TextWatcher {
-    private val MIN_STRENGTH_PASSWORD = 0.5
+    private val MIN_STRENGTH_PASSWORD = 0.4
     private val REQUEST_CODE = 2
     private val GALLERY = 3
     private val CAMERA = 4
