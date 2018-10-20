@@ -9,23 +9,23 @@
     android:background="@mipmap/sol_key"
     tools:layout_editor_absoluteY="50dp">
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@mipmap/sol_key"
-    tools:context="app.itaycsguy.musiciansaidb.LoginActivity"
-    tools:layout_editor_absoluteY="50dp">
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/common_google_signin_btn_text_dark_disabled"
+        tools:context="app.itaycsguy.musiciansaidb.LoginActivity"
+        tools:layout_editor_absoluteY="50dp">
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/google_sign_in_welcome_button"
-            android:layout_width="127dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_width="175dp"
+            android:layout_height="46dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
             android:fontFamily="serif"
             android:gravity="center_horizontal"
             android:text="Sign-In"
@@ -34,18 +34,20 @@
             android:textDirection="ltr"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.502"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.768" />
+            app:layout_constraintVertical_bias="0.744" />
 
         <EditText
             android:id="@+id/text_welcome_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_width="260dp"
+            android:layout_height="32dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="#CCFFFFFF"
             android:ems="10"
             android:fontFamily="serif"
             android:gravity="center_horizontal"
@@ -56,16 +58,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.252" />
+            app:layout_constraintVertical_bias="0.315" />
 
         <EditText
             android:id="@+id/text_welcome_password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="180dp"
-            android:layout_marginEnd="8dp"
+            android:layout_width="260dp"
+            android:layout_height="32dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="180dp"
+            android:background="#CCFFFFFF"
             android:ems="10"
             android:fontFamily="serif"
             android:gravity="center_horizontal"
@@ -76,80 +79,85 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_welcome_email"
-            app:layout_constraintVertical_bias="0.041" />
+            app:layout_constraintVertical_bias="0.008" />
 
         <Button
             android:id="@+id/sign_in_welcome_button"
-            android:layout_width="91dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_width="71dp"
+            android:layout_height="57dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
             android:fontFamily="serif"
             android:gravity="center_horizontal"
-            android:text="Sign-In"
+            android:text="User Login"
             android:textColor="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.299"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.328"
+            app:layout_constraintStart_toEndOf="@+id/sign_up_welcome_button"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.505" />
+            app:layout_constraintVertical_bias="0.555" />
 
         <Button
             android:id="@+id/sign_up_welcome_button"
-            android:layout_width="91dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_width="60dp"
+            android:layout_height="53dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Sign Up"
             android:fontFamily="serif"
             android:gravity="center_horizontal"
-            android:text="Sign-Up"
             android:textColor="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.7"
+            app:layout_constraintHorizontal_bias="0.314"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.499" />
+            app:layout_constraintVertical_bias="0.544" />
 
         <TextView
             android:id="@+id/welcome_text_view"
-            android:layout_width="281dp"
+            android:layout_width="208dp"
             android:layout_height="49dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="serif"
             android:gravity="center_horizontal"
-            android:text="Welcome To MDB"
+            android:text="Musical DB"
             android:textColor="@color/colorPrimary"
             android:textSize="30sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.052" />
+            app:layout_constraintVertical_bias="0.107" />
 
         <Button
             android:id="@+id/forgot_welcome_button"
-            android:layout_width="272dp"
-            android:layout_height="37dp"
-            android:layout_marginEnd="8dp"
+            style="@android:style/Widget.Button.Toggle"
+            android:layout_width="175dp"
+            android:layout_height="46dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="serif"
             android:gravity="center_horizontal"
-            android:text="I forgot my Email/password"
+            android:text="Forgot Your Details?"
             android:textColor="@color/colorPrimary"
             android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.502"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_in_welcome_button" />
+            app:layout_constraintTop_toBottomOf="@+id/google_sign_in_welcome_button"
+            app:layout_constraintVertical_bias="0.172" />
 
-</android.support.constraint.ConstraintLayout>
+    </android.support.constraint.ConstraintLayout>
 </LinearLayout>
