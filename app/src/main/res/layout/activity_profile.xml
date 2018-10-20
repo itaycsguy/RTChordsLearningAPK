@@ -13,16 +13,16 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimaryDark"
+        android:background="@mipmap/background1"
         tools:context="app.itaycsguy.musiciansaidb.ProfileActivity">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/profile_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:title="My Profile"
             android:background="@android:color/holo_blue_bright"
-            android:minHeight="?android:attr/actionBarSize" />
+            android:minHeight="?android:attr/actionBarSize"
+            app:title="My Profile" />
 
         <ImageView
             android:id="@+id/my_profile_photo"
@@ -32,6 +32,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="300dp"
+            android:background="@mipmap/background1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -49,7 +50,7 @@
             android:fontFamily="serif"
             android:gravity="left"
             android:text="User Name:"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@android:color/white"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/profile_givenname"
             app:layout_constraintEnd_toEndOf="parent"
@@ -66,8 +67,8 @@
             android:fontFamily="serif"
             android:gravity="left"
             android:text="Email:"
-            android:textColor="@color/colorPrimary"
             android:textSize="16sp"
+            android:textColor="@android:color/white"
             app:layout_constraintBottom_toTopOf="@+id/profile_username"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -84,7 +85,7 @@
             android:fontFamily="serif"
             android:gravity="left"
             android:text="Permission:"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@android:color/white"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -100,7 +101,7 @@
             android:fontFamily="serif"
             android:gravity="left"
             android:text="Given Name:"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@android:color/white"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/profile_familyname"
             app:layout_constraintEnd_toEndOf="parent"
@@ -116,7 +117,7 @@
             android:fontFamily="serif"
             android:gravity="left"
             android:text="Family Name:"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@android:color/white"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/profile_permission"
             app:layout_constraintEnd_toEndOf="parent"
