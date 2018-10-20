@@ -13,4 +13,8 @@
         android:icon="@drawable/ic_crop"
         android:title="Crop"
         app:showAsAction="always"/>
+    <item android:id="@+id/btn_back"
+        android:icon="@drawable/back_button"
+        android:title="Back"
+        app:showAsAction="always"/>
 </menu>

@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/to_operations_activity"
-    android:icon="@drawable/launch"
+    android:icon="@drawable/to_menu_button"
     android:title="pick_action"
     app:showAsAction="ifRoom">
         <menu>
@@ -9,7 +9,7 @@
         </menu>
     </item>
     <item android:id="@+id/action_logout"
-        android:icon="@drawable/power"
+        android:icon="@drawable/back_button"
         android:title="back"
         app:showAsAction="ifRoom"/>
 </menu>
