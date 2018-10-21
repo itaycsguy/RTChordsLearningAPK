@@ -9,9 +9,10 @@ import android.widget.TextView
 
 class CustomSnackBar {
     companion object {
-        private val color = Color.parseColor("#064fba") // -> (R=6,G=79,B=186)
+        private val color = Color.GRAY // Color.parseColor("#064fba") -> (R=6,G=79,B=186)
         private val duration = Snackbar.LENGTH_LONG
         private val gravity = Gravity.BOTTOM
+        private val textColor = Color.BLACK
 
         fun make(_act : AppCompatActivity,text : CharSequence,color : Int = CustomSnackBar.color,duration : Int = CustomSnackBar.duration,gravity: Int = CustomSnackBar.gravity) {
             val mSnackBar = Snackbar.make(_act.window.decorView.findViewById(android.R.id.content), text,duration)
@@ -21,7 +22,7 @@ class CustomSnackBar {
             view.layoutParams = params
             view.setBackgroundColor(color)
             val mainTextView = view.findViewById(android.support.design.R.id.snackbar_text) as TextView
-            mainTextView.setTextColor(Color.WHITE)
+            mainTextView.setTextColor(textColor)
             mSnackBar.show()
         }
     }

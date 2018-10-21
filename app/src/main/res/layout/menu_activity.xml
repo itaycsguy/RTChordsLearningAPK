@@ -12,15 +12,15 @@
         android:id="@+id/MenuView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@mipmap/background1"
+        android:background="@mipmap/ops_back"
         tools:context=".MenuActivity"
-        tools:layout_editor_absoluteY="81dp">
+        tools:layout_editor_absoluteY="@dimen/_81sdp">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_bright"
+            android:background="@android:color/holo_blue_dark"
             android:minHeight="?android:attr/actionBarSize" />
 
         <ImageView
@@ -28,10 +28,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/toolbar"
-            android:background="@mipmap/background1"
             android:contentDescription="@string/upload_string_common_google_play_services_enable_button"
             android:src="@drawable/common_full_open_on_phone" />
-        <!-- TODO: Morag need to change this common icon by another one he created already by forgot to push -->
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/UploadButton"
@@ -40,11 +38,11 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_gravity="end"
-            android:layout_margin="16dp"
-            android:background="@android:color/holo_blue_bright"
+            android:layout_margin="@dimen/_16sdp"
+            android:background="@android:color/holo_blue_dark"
             android:clickable="true"
             android:focusable="true"
-            app:backgroundTint="@android:color/holo_blue_bright"
+            app:backgroundTint="@android:color/holo_blue_dark"
             app:elevation="0dp"
             app:fabSize="normal"
             app:srcCompat="@android:drawable/ic_menu_upload" />
@@ -52,17 +50,17 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
-            android:layout_width="116dp"
-            android:layout_height="133dp"
+            android:layout_width="@dimen/_116sdp"
+            android:layout_height="@dimen/_133sdp"
             android:layout_alignStart="@+id/UploadedView"
             android:layout_alignTop="@+id/UploadedView"
             android:layout_alignEnd="@+id/UploadedView"
             android:layout_alignBottom="@+id/UploadedView"
             android:layout_gravity="center"
-            android:layout_marginStart="128dp"
-            android:layout_marginTop="191dp"
-            android:layout_marginEnd="140dp"
-            android:layout_marginBottom="187dp"
+            android:layout_marginStart="@dimen/_128sdp"
+            android:layout_marginTop="@dimen/_191sdp"
+            android:layout_marginEnd="@dimen/_140sdp"
+            android:layout_marginBottom="@dimen/_187sdp"
             android:progressDrawable="@android:color/darker_gray"
             android:visibility="invisible" />
 

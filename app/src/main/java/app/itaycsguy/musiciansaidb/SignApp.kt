@@ -7,10 +7,10 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
@@ -27,7 +27,8 @@ import kotlin.collections.HashMap
 
 
 class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),TextWatcher {
-    private val MIN_STRENGTH_PASSWORD = 0.5
+    private val STD_PASSWORD_TYPE = 129
+    private val MIN_STRENGTH_PASSWORD = 0.4
     private val REQUEST_CODE = 2
     private val GALLERY = 3
     private val CAMERA = 4
@@ -61,7 +62,8 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
         _act.findViewById<EditText>(R.id.registiration_email).requestFocus()
         _signUpBtn = _act.findViewById(R.id.registiration_signup_button)
         _signUpBtn.setOnClickListener {
-            // hideKeyboard(_act) // TODO: hide keyboard returns null, cannot handle this issue right now
+             val progressBar = startProgressBar(_act,R.id.signup_progressBar)
+             // hideKeyboard(_act) // TODO: hide keyboard returns null, cannot handle this issue right now
             var detValue = true
             for(value in _fieldMetaHash.values){
                 if(!value){
@@ -76,58 +78,86 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                 val username = (_act.findViewById<EditText>(R.id.registiration_username)).text.toString()
                 val password = (_act.findViewById<EditText>(R.id.registiration_password)).text.toString()
                 val photo = _photoPath.toString()
-                val isValid: Boolean = isValidPassword(password) && isCorrectEmailFormat(email)
-                if (!isValid) {
-                    CustomSnackBar.make(_act, "Invalid details are provided!")
-                } else {
-                    _fbDb.getRef()!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(p0: DataSnapshot) {
-                            if (!p0.exists()) {
-                                CustomSnackBar.make(_act, "Registered!")
-                                val map: HashMap<String, String> = HashMap()
-                                map["authentication_vendor"] = "app"
-                                map["user_name"] = username
-                                map["given_name"] = givenname
-                                map["family_name"] = familyname
-                                map["password"] = password
-                                map["email"] = email
-                                map["photo"] = photo
-                                map["permission"] = "anonymous"
-                                val intent = _act.intent
-                                intent.putExtra("data", map)
-                                _act.onActivityResultWrapper(REQUEST_CODE, intent)
-                            } else {
-                                CustomSnackBar.make(_act, "Account does already exist!")
-                            }
+                _fbDb.getRef()!!.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(p0: DataSnapshot) {
+                        if (!p0.exists()) {
+                            CustomSnackBar.make(_act, "Registered!")
+                            val map: HashMap<String, String> = HashMap()
+                            map["authentication_vendor"] = "app"
+                            map["user_name"] = username
+                            map["given_name"] = givenname
+                            map["family_name"] = familyname
+                            map["password"] = password
+                            map["email"] = email
+                            map["photo"] = photo
+                            map["permission"] = "anonymous"
+                            val intent = _act.intent
+                            intent.putExtra("data", map)
+                            _act.onActivityResultWrapper(REQUEST_CODE, intent)
+                        } else {
+                            CustomSnackBar.make(_act, "Account does already exist!")
                         }
+                    }
 
-                        override fun onCancelled(p0: DatabaseError) {
-                            CustomSnackBar.make(_act, "Data corruption!")
-                        }
-                    })
-                }
+                    override fun onCancelled(p0: DatabaseError) {
+                        stopProgressBar(progressBar)
+                        CustomSnackBar.make(_act, "Data corruption!")
+                    }
+                })
             } else {
+                stopProgressBar(progressBar)
                 CustomSnackBar.make(_act,"Some details are missing/invalid!")
             }
         }
         _act.findViewById<Button>(R.id.registiration_attach_photo_button).setOnClickListener { showPhotoDialog() }
         _act.findViewById<Button>(R.id.registiration_cancel_button).setOnClickListener { _act.showLogin() }
+        _act.findViewById<Button>(R.id.signup_visible_password).setOnClickListener {
+            val visibleBtn = _act.findViewById<Button>(R.id.signup_visible_password)
+            val realPassword = _act.findViewById<EditText>(R.id.registiration_password)
+            when(realPassword.inputType) {
+                STD_PASSWORD_TYPE -> {
+                    visibleBtn.background = _act.getDrawable(R.drawable.invisible)
+                    realPassword.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD // TODO: need to find the same style to 129 font code
+                }
+                InputType.TYPE_TEXT_VARIATION_PASSWORD -> {
+                    visibleBtn.background = _act.getDrawable(R.drawable.visible)
+                    realPassword.inputType = STD_PASSWORD_TYPE
+                }
+            }
+        }
+        _act.findViewById<Button>(R.id.signup_visible_confirm_password).setOnClickListener {
+            val visibleBtn = _act.findViewById<Button>(R.id.signup_visible_confirm_password)
+            val realPassword = _act.findViewById<EditText>(R.id.registiration_confirm_password)
+            when(realPassword.inputType) {
+                STD_PASSWORD_TYPE -> {
+                    visibleBtn.background = _act.getDrawable(R.drawable.invisible)
+                    realPassword.inputType = InputType.TYPE_CLASS_TEXT
+                }
+                InputType.TYPE_CLASS_TEXT -> {
+                    visibleBtn.background = _act.getDrawable(R.drawable.visible)
+                    realPassword.inputType = STD_PASSWORD_TYPE
+                }
+            }
+        }
         this._imageView = ImageView(_act)
     }
 
     override fun afterTextChanged(p0: Editable?) {
         p0?.let {
-            val successContent = ContextCompat.getDrawable(_act,R.drawable.done)
+            // val successContent = ContextCompat.getDrawable(_act,R.drawable.done)
             // val errorContent = ContextCompat.getDrawable(_act,R.drawable.error)
             when(_act.currentFocus) {
                 _act.findViewById<EditText>(R.id.registiration_email) -> {
                     val email = _act.findViewById<EditText>(R.id.registiration_email)
+                    val errorSign = _act.findViewById<TextView>(R.id.signup_email_error)
                     if(isCorrectEmailFormat(email.text.toString())) {
-                        email.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
+                        errorSign.error = null
+                        // email.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         email.setBackgroundColor(Color.parseColor("#c1e7d2"))
                         _fieldMetaHash["email"] = true
                     } else {
-                        email.error = "Invalid email address. Check you own one."
+                        errorSign.error = "Invalid email address."
+                        // email.tooltipText = errorSign.error
                         // email.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         email.setBackgroundColor(Color.parseColor("#f7bfbf"))
                         _fieldMetaHash["email"] = false
@@ -135,12 +165,15 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                 }
                 _act.findViewById<EditText>(R.id.registiration_givenname) -> {
                     val givenname = _act.findViewById<EditText>(R.id.registiration_givenname)
+                    val errorSign = _act.findViewById<TextView>(R.id.signup_givenname_error)
                     if(givenname.text.toString().length > 1){
-                        givenname.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
+                        errorSign.error = null
+                        // givenname.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         givenname.setBackgroundColor(Color.parseColor("#c1e7d2"))
                         _fieldMetaHash["givenName"] = true
                     } else {
-                        givenname.error = "Looks as not real name."
+                        errorSign.error = "Looks as not real name."
+                        // givenname.tooltipText = errorSign.error
                         // givenname.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         givenname.setBackgroundColor(Color.parseColor("#f7bfbf"))
                         _fieldMetaHash["givenName"] = false
@@ -148,12 +181,15 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                 }
                 _act.findViewById<EditText>(R.id.registiration_family_name) -> {
                     val familyname = _act.findViewById<EditText>(R.id.registiration_family_name)
+                    val errorSign = _act.findViewById<TextView>(R.id.signup_familyname_error)
                     if(familyname.text.toString().length > 1){
-                        familyname.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
+                        errorSign.error = null
+                        // familyname.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         familyname.setBackgroundColor(Color.parseColor("#c1e7d2"))
                         _fieldMetaHash["familyName"] = true
                     } else {
-                        familyname.error = "Looks as not real name."
+                        errorSign.error = "Looks as not real name."
+                        // familyname.tooltipText = errorSign.error
                         // familyname.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         familyname.setBackgroundColor(Color.parseColor("#f7bfbf"))
                         _fieldMetaHash["familyName"] = false
@@ -162,12 +198,15 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                 _act.findViewById<EditText>(R.id.registiration_username) -> {
                     val username = _act.findViewById<EditText>(R.id.registiration_username)
                     val checkUsername = username.text.toString().replace("\\s".toRegex(), "")
+                    val errorSign = _act.findViewById<TextView>(R.id.signup_username_error)
                     if(username.text.toString().length > 1 && username.text.toString().length == checkUsername.length){
-                        username.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
+                        errorSign.error = null
+                        // username.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         username.setBackgroundColor(Color.parseColor("#c1e7d2"))
                         _fieldMetaHash["username"] = true
                     } else {
-                        username.error = "Invalid username. no spaces is required."
+                        errorSign.error = "Invalid username. no spaces is required."
+                        // username.tooltipText = errorSign.error
                         // username.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         username.setBackgroundColor(Color.parseColor("#f7bfbf"))
                         _fieldMetaHash["username"] = false
@@ -177,12 +216,15 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                     val password = _act.findViewById<EditText>(R.id.registiration_password)
                     val passwordManager = PasswordManager()
                     val evaluation = passwordManager.evaluatePassword(password.text.toString())
+                    val errorSign = _act.findViewById<TextView>(R.id.signup_password_error)
                     if(evaluation >= MIN_STRENGTH_PASSWORD) {
-                        password.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
+                        errorSign.error = null
+                        // password.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                         password.setBackgroundColor(Color.parseColor("#c1e7d2"))
                         _fieldMetaHash["password"] = true
                     } else {
-                        password.error = "Invalid password. Length 10-20. Prohibit characters: ${PasswordManager.DUTY_LETTERS}"
+                        errorSign.error = "Invalid password. Required characters: ${PasswordManager.DUTY_LETTERS}"
+                        // password.tooltipText = errorSign.error
                         // password.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         password.setBackgroundColor(Color.parseColor("#f7bfbf"))
                         _fieldMetaHash["password"] = false
@@ -191,19 +233,23 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                 _act.findViewById<EditText>(R.id.registiration_confirm_password) -> {
                     val password = _act.findViewById<EditText>(R.id.registiration_password)
                     val confirmPassword = _act.findViewById<EditText>(R.id.registiration_confirm_password)
+                    val errorSign = _act.findViewById<TextView>(R.id.signup_confirm_password_error)
                     if(password.text.toString().isNotEmpty()) {
                         if(password.text.toString() == confirmPassword.text.toString()){
-                            confirmPassword.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
+                            errorSign.error = null
+                            // confirmPassword.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
                             confirmPassword.setBackgroundColor(Color.parseColor("#c1e7d2"))
                             _fieldMetaHash["confirmPassword"] = true
                         } else {
-                            confirmPassword.error = "Invalid password. Length 10-20. Prohibit characters: ${PasswordManager.DUTY_LETTERS}"
+                            errorSign.error = "Invalid password. Required characters: ${PasswordManager.DUTY_LETTERS}"
+                            // confirmPassword.tooltipText = errorSign.error
                             // confirmPassword.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                             confirmPassword.setBackgroundColor(Color.parseColor("#f7bfbf"))
                             _fieldMetaHash["confirmPassword"] = false
                         }
                     } else {
-                        confirmPassword.error = "Invalid operation. Fill up the upper password/match passwords"
+                        errorSign.error = "Invalid operation. Fill up the upper password/match passwords"
+                        // confirmPassword.tooltipText = errorSign.error
                         // password.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
                         _fieldMetaHash["confirmPassword"] = false
                     }

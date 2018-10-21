@@ -3,14 +3,18 @@ package app.itaycsguy.musiciansaidb
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 
 class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
+    private val STD_PASSWORD_TYPE = 129 // TODO: need to look for code which is presenting the same style without any kind of coding such as points
     private val REQUEST_CODE = 0
     private val _act : StartActivity = act as StartActivity
     private val _fbDb = fbDb
@@ -29,6 +33,21 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
         }
         (_act.findViewById<Button>(R.id.sign_up_welcome_button)).setOnClickListener { _act.showSignUp() }
         (_act.findViewById<Button>(R.id.forgot_welcome_button)).setOnClickListener { _act.showRecovery() }
+        _act.findViewById<Button>(R.id.welcome_visible_password).setOnClickListener {
+            Toast.makeText(_act,"${InputType.TYPE_TEXT_VARIATION_PASSWORD}",Toast.LENGTH_LONG).show()
+            val visibleBtn = _act.findViewById<Button>(R.id.welcome_visible_password)
+            val realPassword = _act.findViewById<EditText>(R.id.text_welcome_password)
+            when(realPassword.inputType) {
+                STD_PASSWORD_TYPE -> {
+                    visibleBtn.background = _act.getDrawable(R.drawable.invisible)
+                    realPassword.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD // TODO: need to find the same style to 129 font code
+                }
+                InputType.TYPE_TEXT_VARIATION_PASSWORD -> {
+                    visibleBtn.background = _act.getDrawable(R.drawable.visible)
+                    realPassword.inputType = STD_PASSWORD_TYPE
+                }
+            }
+        }
     }
 
     // not relevant but exist
@@ -54,6 +73,7 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
 
     private fun checkExistAccount(email: String,password: String) {
         (_fbDb.getRef())?.let {
+            val progressBar = startProgressBar(_act,R.id.login_progressBar)
         it.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
                 if (p0.exists() && p0.child("authentication_vendor").value == "app") {
@@ -71,7 +91,10 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
                         intent.putExtra("data",map)
                         _act.onActivityResultWrapper(REQUEST_CODE,intent)
                     }
-                } else { CustomSnackBar.make(_act,  "Account does not exist!") }
+                } else {
+                    stopProgressBar(progressBar)
+                    CustomSnackBar.make(_act,  "Account does not exist!")
+                }
             }
 
             override fun onCancelled(p0: DatabaseError) { CustomSnackBar.make(_act,  "Data corruption!") }

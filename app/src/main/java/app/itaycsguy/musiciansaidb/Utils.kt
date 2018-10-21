@@ -2,9 +2,15 @@ package app.itaycsguy.musiciansaidb
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Environment
+import android.support.v4.content.ContextCompat.getSystemService
+import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ProgressBar
 import java.io.*
 import java.lang.Exception
 import java.util.regex.Pattern
@@ -73,7 +79,7 @@ private fun createTemporalFile(context : Context): File {
 //    return File(context.externalCacheDir, "tempFile.jpg") // context needed
 }
 
-val PASSWORD_LENGTH = 8
+val PASSWORD_LENGTH = 6
 
 fun isValidPassword(password: String):Boolean{
     return password.length >= PASSWORD_LENGTH
@@ -93,4 +99,23 @@ fun isCorrectEmailFormat(email: String): Boolean {
 fun hideKeyboard(act : Activity) {
     val imm = act.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(act.currentFocus.windowToken, 0)
+}
+
+fun startProgressBar(act : Activity,pBar : Int) : ProgressBar {
+    val progressBar : ProgressBar = act.findViewById(pBar)
+    progressBar.indeterminateDrawable.setColorFilter(Color.DKGRAY, android.graphics.PorterDuff.Mode.MULTIPLY)
+    progressBar.visibility = View.VISIBLE  //To show ProgressBar
+    return progressBar
+}
+
+fun stopProgressBar(progressBar: ProgressBar){
+    progressBar.visibility = View.INVISIBLE  //To show ProgressBar
+}
+
+fun isNetworkAvailable(act : Activity): Boolean {
+    val connectivityManager = act.getSystemService(Context.CONNECTIVITY_SERVICE)
+    return if (connectivityManager is ConnectivityManager) {
+        val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+        networkInfo?.isConnected ?: false
+    } else false
 }

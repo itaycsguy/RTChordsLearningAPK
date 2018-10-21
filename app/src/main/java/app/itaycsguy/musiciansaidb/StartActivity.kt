@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.EditText
 import android.graphics.Color
+import android.view.View
+import android.widget.ProgressBar
 import java.io.Serializable
 
 class StartActivity : AppCompatActivity(), Serializable {
@@ -48,15 +50,19 @@ class StartActivity : AppCompatActivity(), Serializable {
     }
 
     fun showRecovery() {
+        val progressBar = startProgressBar(this,R.id.login_progressBar)
         _currLayout = R.layout.activity_login_recovery
         setContentView(_currLayout)
         _userRecovery.initOperations()
+        stopProgressBar(progressBar)
     }
 
     fun showSignUp() {
+        val progressBar = startProgressBar(this,R.id.login_progressBar)
         _currLayout = R.layout.activity_signup
         setContentView(_currLayout)
         _signApp.initOperations()
+        stopProgressBar(progressBar)
     }
 
     fun showLogin() {
@@ -117,6 +123,7 @@ class StartActivity : AppCompatActivity(), Serializable {
     fun userProfileActivityOnStart(user : User){
         val intent = Intent(this, ProfileActivity::class.java)
         intent.putExtra("user",user.getHashDetails())
+        findViewById<ProgressBar>(R.id.login_progressBar).visibility = View.INVISIBLE
         startActivity(intent)
     }
 }

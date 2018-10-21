@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.app.Activity
 import android.support.v4.content.ContextCompat.getSystemService
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 
 
 class UserRecovery(act : AppCompatActivity,fbAuth : FirebaseAuth) : TextWatcher {
@@ -36,39 +37,26 @@ class UserRecovery(act : AppCompatActivity,fbAuth : FirebaseAuth) : TextWatcher 
         return REQUESTCODE
     }
 
-    override fun afterTextChanged(p0: Editable?) {
-        p0?.let {
-            val successContent = ContextCompat.getDrawable(_act,R.drawable.success)
-            val errorContent = ContextCompat.getDrawable(_act,R.drawable.error)
-            when(_act.currentFocus) {
-                _act.findViewById<EditText>(R.id.text_email_recovery) -> {
-                    val email = _act.findViewById<EditText>(R.id.text_email_recovery)
-                    if(isCorrectEmailFormat(email.text.toString())) {
-                        email.setCompoundDrawablesWithIntrinsicBounds(null, null, successContent, null)
-                        email.setBackgroundColor(Color.parseColor("#c1e7d2"))
-                    } else {
-                        email.setCompoundDrawablesWithIntrinsicBounds(null, null, errorContent, null)
-                        email.setBackgroundColor(Color.parseColor("#f7bfbf"))
-                    }
-                }
-            }
-        }
-    }
-
     // not relevant but exist
+    override fun afterTextChanged(p0: Editable?) {}
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     private fun sendEmail(email: String) {
+        val progressBar = startProgressBar(_act,R.id.recovery_progressBar)
         _fbAuth.getInstance().sendPasswordResetEmail(email)
                 .addOnCompleteListener {
                     task ->
                     // TODO: need to callback this method for update his new password determination
                     if (task.isSuccessful) {
                         CustomSnackBar.make(_act,   "Email has been sent already.. Check your Inbox!")
+                        stopProgressBar(progressBar)
                         _act.showLogin()
                     }
-                    else { CustomSnackBar.make(_act,   "Had failure by sending.") }
+                    else {
+                        CustomSnackBar.make(_act,   "Had failure by sending.")
+                        stopProgressBar(progressBar)
+                    }
                 }
     }
 }
