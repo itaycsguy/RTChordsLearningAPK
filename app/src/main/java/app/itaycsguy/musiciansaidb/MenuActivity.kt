@@ -43,7 +43,6 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     private lateinit var currentImage : ImageView
     private lateinit var cordinatorView : View
     private lateinit var _user : User
-
     //Firebase
     private lateinit var _firebaseStorage : FirebaseStorage
     private lateinit var _storageReference : StorageReference
@@ -159,12 +158,10 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
                 }
             }
             REQUEST_IMAGE_CAPTURE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    if (data != null) {
-                        openCrop()
-                    }
-                }
-                else{
+                if ((resultCode == Activity.RESULT_OK)
+                                .and(data != null).or(uri != null) ) {
+                    openCrop()
+                } else{
                     //Reaching here means that the uri is pointing into an empty file location.
                     uri = null
                     currentImage.setImageResource(R.drawable.common_full_open_on_phone)
@@ -234,6 +231,9 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
                         progressBar.progress = (100.0*it.bytesTransferred/it.totalByteCount).toInt()
                     }
         }
+        else{
+            Toast.makeText(this,"In order to upload you need to first pick a picture", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun openCrop(){
@@ -258,7 +258,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         file = File(Environment.getExternalStorageDirectory(),
                 "chord_${System.currentTimeMillis()}.jpg")
 
-        imageChanged(file)
+        uri = Uri.fromFile(file)
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
         takePictureIntent.putExtra("return-data", true)
         takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -266,8 +266,6 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     }
 
     private fun openGallery(){
-        // TODO: 2 WAYS HERE TO OPEN DIFFERENT GALLERY SO TRY THEM BOTH
-        // val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         val gallery = Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         gallery.type = "image/*"
         startActivityForResult(Intent.createChooser(gallery, "Select Image from the gallery"), REQUEST_GALLERY_IMAGE)
@@ -303,9 +301,5 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         override fun newArray(size: Int): Array<MenuActivity?> {
             return arrayOfNulls(size)
         }
-    }
-
-    private fun imageChanged(file: File){
-        uri = Uri.fromFile(file)
     }
 }
