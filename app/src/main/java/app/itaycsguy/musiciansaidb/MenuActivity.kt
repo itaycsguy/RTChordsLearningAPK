@@ -2,19 +2,14 @@ package app.itaycsguy.musiciansaidb
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Path
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
-import android.os.SystemClock.sleep
 import android.provider.MediaStore
-import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -23,16 +18,14 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.Toast
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import com.yalantis.ucrop.UCrop
-import eu.janmuller.android.simplecropimage.CropImage
 import java.io.File
-import java.lang.Exception
 import java.util.*
 
 @SuppressLint("ByteOrderMark", "Registered")
@@ -106,14 +99,16 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
 
 
         uploadButton.setOnClickListener {
-            uploadImage()
-            val infoText: String = if (_user.getPermission() == "anonymous"){
-                "The Image is pending for approval before entering our database, thanks for your support"
-            } else {
-                //TODO: change the user's permission to be an enum with the different permissions and address them all here.
-                "The Image is automatically approved since you possess the right permission level"
+            val uploadResult = uploadImage()
+            if (uploadResult == Activity.RESULT_OK) {
+                val infoText: String = if (_user.getPermission() == "anonymous") {
+                    "The Image is pending for approval before entering our database, thanks for your support"
+                } else {
+                    //TODO: change the user's permission to be an enum with the different permissions and address them all here.
+                    "The Image is automatically approved since you possess the right permission level"
+                }
+                Toast.makeText(this, infoText, Toast.LENGTH_LONG).show()
             }
-            Toast.makeText(this, infoText, Toast.LENGTH_LONG).show()
         }
 
     }
@@ -193,11 +188,11 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         item?.let {
             when {
-                item.itemId == R.id.btn_camera -> openCamera()
-                item.itemId == R.id.btn_gallery -> openGallery()
-                item.itemId == R.id.btn_crop -> openCrop()
-                item.itemId == R.id.btn_back -> backToProfile()
-            }
+            item.itemId == R.id.btn_camera -> openCamera()
+            item.itemId == R.id.btn_gallery -> openGallery()
+            item.itemId == R.id.btn_crop -> openCrop()
+            item.itemId == R.id.btn_back -> backToProfile()
+        }
         }
         return true
     }
@@ -209,7 +204,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     }
 
 
-    private fun uploadImage() {
+    private fun uploadImage(): Int {
         if (uri != null){
             val progressBar : ProgressBar = findViewById(R.id.progressBar)
             progressBar.indeterminateDrawable.setColorFilter(Color.DKGRAY, android.graphics.PorterDuff.Mode.MULTIPLY)
@@ -230,9 +225,11 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
                     .addOnProgressListener{
                         progressBar.progress = (100.0*it.bytesTransferred/it.totalByteCount).toInt()
                     }
+            return Activity.RESULT_OK
         }
         else{
-            Toast.makeText(this,"In order to upload you need to first pick a picture", Toast.LENGTH_SHORT).show()
+             Toast.makeText(this,"In order to upload you need to first pick a picture", Toast.LENGTH_SHORT).show()
+            return Activity.RESULT_CANCELED
         }
     }
 
