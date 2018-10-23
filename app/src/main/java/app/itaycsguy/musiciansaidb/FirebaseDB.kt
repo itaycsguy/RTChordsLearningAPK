@@ -7,6 +7,10 @@ import com.google.firebase.database.FirebaseDatabase
 class FirebaseDB {
     private val _firebaseDB : FirebaseDatabase = FirebaseDatabase.getInstance()
     companion object {
+        val TEMP_IMAGES = "temp_images"
+        val VERIFIED_IMAGES = "verified_images"
+        val IMAGES_DB = "Images_Database"
+
         fun encodeUserEmail(email : String) : String {
             val emailParts : List<String> = email.split("@")
             val secondPart = emailParts[1].replace(".","_")

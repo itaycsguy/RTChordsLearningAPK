@@ -107,7 +107,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
 
         uploadButton.setOnClickListener {
             uploadImage()
-            val infoText: String = if (_user.getPermission() == "anonymous"){
+            val infoText: String = if (_user.getPermission().toLowerCase() == User.BASIC_PERMISSION){
                 "The Image is pending for approval before entering our database, thanks for your support"
             } else {
                 //TODO: change the user's permission to be an enum with the different permissions and address them all here.
@@ -214,9 +214,9 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
             val progressBar : ProgressBar = findViewById(R.id.progressBar)
             progressBar.indeterminateDrawable.setColorFilter(Color.DKGRAY, android.graphics.PorterDuff.Mode.MULTIPLY)
             progressBar.visibility = View.VISIBLE  //To show ProgressBar
-            val database : String = if (_user.getPermission() == "anonymous") "temp_images" else "verified_images"
+            val database : String = if (_user.getPermission().toLowerCase() == User.BASIC_PERMISSION) FirebaseDB.TEMP_IMAGES else FirebaseDB.VERIFIED_IMAGES
             val ref = _storageReference.child(
-                    "Images_Database/" +
+                    "${FirebaseDB.IMAGES_DB}/" +
                             "$database/" +
                             "${_user.getUserName()}_${UUID.randomUUID()}")
             ref.putFile(uri!!)
