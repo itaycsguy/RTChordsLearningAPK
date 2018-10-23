@@ -109,8 +109,6 @@ class StartActivity : AppCompatActivity(), Serializable {
             }
         } else if(requestCode == _userRecovery.getReqCode()) {
             CustomSnackBar.make(this, "Waiting to recovery email...")
-        } else {
-            CustomSnackBar.make(this, "Some connection error was occur, try again.")
         }
     }
 
