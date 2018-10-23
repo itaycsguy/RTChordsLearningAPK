@@ -2,8 +2,10 @@ package app.itaycsguy.musiciansaidb
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
@@ -15,10 +17,15 @@ import android.os.*
 import android.os.SystemClock.sleep
 import android.provider.MediaStore
 import android.support.annotation.NonNull
+import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.TextInputEditText
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.text.InputType
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -26,6 +33,9 @@ import android.view.View
 import android.widget.*
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
@@ -34,7 +44,9 @@ import eu.janmuller.android.simplecropimage.CropImage
 import java.io.File
 import java.lang.Exception
 import java.util.*
+import kotlin.collections.HashMap
 
+@Suppress("NAME_SHADOWING")
 @SuppressLint("ByteOrderMark", "Registered")
 class MenuActivity() : AppCompatActivity(), Parcelable {
     /*
@@ -54,6 +66,8 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     lateinit var file : File
     private var mFileTemp: File? = null
     private lateinit var cropIntent : Intent
+
+    private var _imageHashPath : String? = null
 
     /*
     Const values for result
@@ -91,6 +105,52 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         toolbar = findViewById(R.id.toolbar)
         toolbar.title = ("Choose Operation")
         setSupportActionBar(toolbar)
+
+        findViewById<FloatingActionButton>(R.id.metaDataButton).setOnClickListener { _ ->
+            if(_imageHashPath == null) {
+                Toast.makeText(this, "Upload an image at first!", Toast.LENGTH_LONG).show()
+            } else {
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("Image-Metadata")
+                // Set up the input
+                val input = EditText(this)
+                input.inputType = InputType.TYPE_CLASS_TEXT
+                builder.setView(input)
+                val currAct = this
+                builder.setPositiveButton("OK") { _, _ ->
+                    (_firebaseDB.getRef())?.let {
+                        val progressBar = startProgressBar(this,R.id.login_progressBar)
+                        it.child("temp_images_metadata/$_imageHashPath").ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(p0: DataSnapshot) {
+                                if (p0.exists()) {
+                                    val map = HashMap<String,String>()
+                                    map["email"] = FirebaseDB.encodeUserEmail(_user.getEmail())
+                                    map["writer"] = findViewById<TextInputEditText>(R.id.metadata_writer).toString()
+                                    map["chord_name"] = findViewById<TextInputEditText>(R.id.metadata_chord_name).toString()
+                                    map["location"] = findViewById<TextInputEditText>(R.id.metadata_location_name).toString()
+                                    map["upload_time"] = (System.currentTimeMillis()/1000).toString()
+                                    try {
+                                        //_firebaseDB.writeTempImgMetadata(map)
+                                        Toast.makeText(currAct, "DB was updated successfully!", Toast.LENGTH_LONG).show()
+                                    } catch(e : Exception){
+                                        Toast.makeText(currAct, "Could not meet an updating", Toast.LENGTH_LONG).show()
+                                    }
+                                } else {
+                                    Log.i(TAG, "Weird problem is occurred.")
+                                }
+                                stopProgressBar(progressBar)
+                            }
+
+                            override fun onCancelled(p0: DatabaseError) {
+                                stopProgressBar(progressBar)
+                                CustomSnackBar.make(currAct,  "Data corruption!")
+                            }
+                        }) }
+                }
+                builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+                builder.show()
+            }
+        }
 
         val permissionCameraCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
         val permissionWriteCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -215,10 +275,11 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
             progressBar.indeterminateDrawable.setColorFilter(Color.DKGRAY, android.graphics.PorterDuff.Mode.MULTIPLY)
             progressBar.visibility = View.VISIBLE  //To show ProgressBar
             val database : String = if (_user.getPermission().toLowerCase() == User.BASIC_PERMISSION) FirebaseDB.TEMP_IMAGES else FirebaseDB.VERIFIED_IMAGES
+            _imageHashPath = "${_user.getUserName()}_${UUID.randomUUID()}"
             val ref = _storageReference.child(
                     "${FirebaseDB.IMAGES_DB}/" +
                             "$database/" +
-                            "${_user.getUserName()}_${UUID.randomUUID()}")
+                            _imageHashPath)
             ref.putFile(uri!!)
                     .addOnSuccessListener {
                         progressBar.visibility = View.GONE     // To Hide ProgressBar
