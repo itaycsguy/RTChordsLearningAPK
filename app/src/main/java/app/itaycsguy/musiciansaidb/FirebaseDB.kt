@@ -36,8 +36,17 @@ class FirebaseDB {
         userEntry.setValue(map)
     }
 
-    fun writeTempImg(img : ImageView){
+    fun writeTempImagesMetadata(key : String, map : HashMap<String,String>){
+        val tempImgsMetadataEntry = _firebaseDB.getReference("temp_images_metadata/$key")
+        tempImgsMetadataEntry.setValue(map)
+    }
 
+    fun writeVerifiedImagesMetadata(key : String, map : HashMap<String,String>){
+        val verifiedImgsMetadataEntry = _firebaseDB.getReference("verified_images_metadata/$key")
+        verifiedImgsMetadataEntry.setValue(map)
+    }
+
+    fun writeTempImg(img : ImageView){
         val userEntry = _firebaseDB.getReference("temp_img")
 //        System.err.println("the drawable object looks like this: ${img.drawable}")
 //        userEntry.setValue(img.drawable)

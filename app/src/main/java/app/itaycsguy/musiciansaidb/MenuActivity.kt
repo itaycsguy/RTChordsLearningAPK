@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -16,18 +17,15 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.text.InputType
 import android.util.Log
 import android.view.*
 import android.widget.*
-import app.itaycsguy.musiciansaidb.R.string.search
 import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.common.api.Status
-import com.google.android.gms.location.places.AutocompleteFilter
-import com.google.android.gms.location.places.Place
-import com.google.android.gms.location.places.ui.PlaceSelectionListener
-import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment
-import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -37,6 +35,7 @@ import com.yalantis.ucrop.UCrop
 import java.io.File
 import java.lang.Exception
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
@@ -61,10 +60,13 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
     private var mFileTemp: File? = null
     private lateinit var cropIntent : Intent
 
+    /*
+    Itay additionals:
+     */
     private var _imageHashPath : String? = null
     private var _placesLocation : String? = null
-    private lateinit var _notesSpinner : Spinner
-//    private lateinit var _countriesSpinner : AutoCompleteTextView
+    private var _notesName : String? = null
+    private lateinit var _alertDialog : AlertDialog
 
     /*
     Const values for result
@@ -88,7 +90,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
 
         //Get user data from Start Activity
         _user = User(intent.getSerializableExtra("user") as HashMap<String,String>)
-        Toast.makeText(this, "Logged in as ${_user.getUserName()}.", Toast.LENGTH_SHORT).show()
+        // Toast.makeText(this, "Logged in as ${_user.getUserName()}.", Toast.LENGTH_SHORT).show()
 
         // Setting temp file for cropping to external storage dir
         mFileTemp = File(Environment.getExternalStorageDirectory(), TEMP_PHOTO_FILE_NAME)
@@ -140,29 +142,25 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
     private fun buildMetadataDialog() : AlertDialog{
         val currAct = this
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Image-Metadata")
+        builder.setTitle("Current-Image-Metadata")
                 .setView(layoutInflater.inflate(R.layout.activity_metadata,null))
                 .setPositiveButton("OK") { _, _ ->
                     (_firebaseDB.getRef())?.let {
                         val progressBar = startProgressBar(currAct,R.id.progressBar)
                         it.child("temp_images_metadata/$_imageHashPath").ref.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(p0: DataSnapshot) {
-                                if (p0.exists() && _placesLocation != null) {
+                                if (p0.exists() && _placesLocation != null && _notesName != null) {
                                     val map = HashMap<String,String>()
                                     map["email"] = FirebaseDB.encodeUserEmail(_user.getEmail())
-                                    map["writer"] = findViewById<EditText>(R.id.metadata_writer).toString()
-                                    map["chord_name"] = findViewById<EditText>(R.id.metadata_note_name).toString()
+                                    map["writer"] = _alertDialog.findViewById<EditText>(R.id.metadata_writer).toString()
+                                    map["note_name"] = _notesName.toString()
                                     map["location"] = _placesLocation.toString()
                                     map["upload_time"] = (System.currentTimeMillis()/1000).toString()
                                     try {
-                                        //_firebaseDB.writeTempImgMetadata(map)
+                                        _firebaseDB.writeTempImagesMetadata(_imageHashPath.toString(),map)
                                         Toast.makeText(currAct, "DB was updated successfully!", Toast.LENGTH_LONG).show()
-                                    } catch(e : Exception){
-                                        Toast.makeText(currAct, "Could not meet an updating", Toast.LENGTH_LONG).show()
-                                    }
-                                } else {
-                                    Log.i(TAG, "Weird problem is occurred.")
-                                }
+                                    } catch(e : Exception){ Toast.makeText(currAct, "Could not meet an updating", Toast.LENGTH_LONG).show() }
+                                } else { Log.i(TAG, "Weird problem is occurred.") }
                                 stopProgressBar(progressBar)
                             }
 
@@ -176,65 +174,60 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                 layoutInflater.inflate(R.layout.menu_activity,null)
                 dialog.cancel()
         }
-        val alertDialog = builder.create()
-        alertDialog.show()
+        _alertDialog = builder.create()
+        _alertDialog.show()
 //        add dropdown field:
 //        ===================
-        _notesSpinner = alertDialog.findViewById(R.id.metadata_note_name)
+        val notesSpinner : Spinner = _alertDialog.findViewById(R.id.metadata_note_name)
         val chordsArray = resources.getStringArray(R.array.notes_array)
         val dataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, chordsArray)
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        _notesSpinner.adapter = dataAdapter
-        alertDialog.findViewById<Spinner>(R.id.metadata_note_name).onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(p0: AdapterView<*>?) { Toast.makeText(currAct,"$p0",Toast.LENGTH_LONG).show() }
+        notesSpinner.adapter = dataAdapter
+        _alertDialog.findViewById<Spinner>(R.id.metadata_note_name).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
 
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                Toast.makeText(currAct,"$p0,$p1,$p2,$p3",Toast.LENGTH_LONG).show()
-            }
+                p0?.let {
+                    _notesName = it.getItemAtPosition(p2).toString()
+                    when {
+                        _notesName.equals("Choose Note Type...") -> {
+                            _notesName = null
+                            it.setSelection(0)
+                        }
+                        _notesName.equals("Special Note") -> {
+                            _notesName = null
+                            val freeInput = EditText(currAct)
+                            freeInput.hint = "Type Special Note Name"
+                            freeInput.inputType = InputType.TYPE_CLASS_TEXT
+                            val builder = AlertDialog.Builder(currAct)
+                            builder.setTitle("Special Note:")
+                                .setView(freeInput)
+                                .setPositiveButton("OK") { _, _ ->
+                                    _notesName = freeInput.text.toString()
+                                    Toast.makeText(currAct,"$_notesName",Toast.LENGTH_LONG).show()
+                            }
+                            builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+                            builder.create().show()
+                        }
+                    }
+                }
 
+            }
         }
 //        add google places search field:
 //        ===============================
-        alertDialog.findViewById<Button>(R.id.google_maps).setOnClickListener { _ ->
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Google-Places-Search")
-                    .setView(layoutInflater.inflate(R.layout.activity_google_search,null))
-                    .setPositiveButton("OK") { _, _ ->
-
-                    }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    layoutInflater.inflate(R.layout.menu_activity,null)
-                    dialog.cancel()
-            }
-            val alertDialog = builder.create()
-            alertDialog.show()
-            val places = supportFragmentManager.findFragmentById(R.id.google_autocomplete_location_search)
-                    as SupportPlaceAutocompleteFragment?
-            val typeFilter = AutocompleteFilter
-                    .Builder()
-                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
-                    .build()
-            places?.let {
-                it.setFilter(typeFilter)
-                it.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-                    override fun onPlaceSelected(place: Place) {
-                        Toast.makeText(applicationContext, place.name, Toast.LENGTH_SHORT).show()
-                    }
-
-                    override fun onError(status: Status) {
-                        Toast.makeText(applicationContext, status.toString(), Toast.LENGTH_SHORT).show()
-                    }
-                })
+        _alertDialog.findViewById<Button>(R.id.google_maps).setOnClickListener { _ ->
+            try{
+                intent = PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                        .build(this)
+                startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE)
+            } catch (e : GooglePlayServicesRepairableException) {
+                Toast.makeText(currAct,"${e.connectionStatusCode}",Toast.LENGTH_LONG).show()
+            } catch (e : GooglePlayServicesNotAvailableException) {
+                Toast.makeText(currAct,"${e.errorCode}",Toast.LENGTH_LONG).show()
             }
         }
-//        add places autocomplete search field using local dataset:
-//        =========================================================
-//        _countriesSpinner = alertDialog.findViewById(R.id.autocomplete_location_search)
-//        val countriesArray = resources.getStringArray(R.array.countries_array)
-//        val countriesAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, countriesArray)
-//        _countriesSpinner.setAdapter(countriesAdapter)
-//        _countriesSpinner.threshold = 4
-        return alertDialog
+        return _alertDialog
     }
 
     private fun setTempFile() {
@@ -265,6 +258,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
         takePictureIntent = parcel.readParcelable(Intent::class.java.classLoader)!!
     }
 
+    @SuppressLint("RtlHardcoded")
     override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?){
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
@@ -299,11 +293,15 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                     throw UCrop.getError(data!!)!!
                 }
             }
-//            PLACE_AUTOCOMPLETE_REQUEST_CODE -> {
-//                val place = PlaceAutocomplete.getPlace(this, data)
-//                _placesLocation = place.toString()
-//                Toast.makeText(this, _placesLocation, Toast.LENGTH_SHORT).show()
-//            }
+            PLACE_AUTOCOMPLETE_REQUEST_CODE -> {
+                if(resultCode == RESULT_OK) {
+                    val place = PlaceAutocomplete.getPlace(this, data)
+                    _placesLocation = "${place.address}"
+                    val locationField = _alertDialog.findViewById<TextView>(R.id.google_location_name)
+                    locationField.text = _placesLocation
+                    locationField.gravity = Gravity.LEFT
+                }
+            }
         }
 
     }
@@ -317,10 +315,10 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         item?.let {
             when {
-                item.itemId == R.id.btn_camera -> openCamera()
-                item.itemId == R.id.btn_gallery -> openGallery()
-                item.itemId == R.id.btn_crop -> openCrop()
-                item.itemId == R.id.btn_back -> backToProfile()
+                it.itemId == R.id.btn_camera -> openCamera()
+                it.itemId == R.id.btn_gallery -> openGallery()
+                it.itemId == R.id.btn_crop -> openCrop()
+                it.itemId == R.id.btn_back -> backToProfile()
             }
         }
         return true
@@ -356,9 +354,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                         progressBar.progress = (100.0*it.bytesTransferred/it.totalByteCount).toInt()
                     }
         }
-        else{
-            Toast.makeText(this,"In order to upload you need to first pick a picture", Toast.LENGTH_SHORT).show()
-        }
+        else{ Toast.makeText(this,"In order to upload you need to first pick a picture", Toast.LENGTH_SHORT).show() }
     }
 
     private fun openCrop(){
@@ -428,7 +424,5 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
         }
     }
 
-    override fun onConnectionFailed(p0: ConnectionResult) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun onConnectionFailed(p0: ConnectionResult) {}
 }
