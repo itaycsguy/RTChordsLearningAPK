@@ -68,8 +68,8 @@ class GoogleAuth(act : AppCompatActivity) : GoogleApiClient.OnConnectionFailedLi
             map["photo"] = account.photoUrl.toString()
             map["given_name"] = account.givenName.toString()
             map["family_name"] = account.familyName.toString()
-            map["authentication_vendor"] = "google"
-            map["permission"] = "anonymous"
+            map["authentication_vendor"] = "Google"
+            map["permission"] = "Anonymous"
             _userData = map
         }
     }

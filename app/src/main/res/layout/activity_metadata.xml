@@ -14,30 +14,33 @@
         android:inputType="text"
         android:textSize="@dimen/_14sdp" />
 
-    <EditText
-        android:id="@+id/metadata_chord_name"
+    <Spinner
+        android:id="@+id/metadata_note_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:hint="Choose Chord Type"
+        android:hint="Choose Note Type"
         android:textSize="@dimen/_14sdp" />
 
 
-    <!--<fragment-->
+    <Button
+        android:id="@+id/google_maps"
+        android:layout_width="47dp"
+        android:layout_height="36dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/places_ic_search" />
+    <!--<AutoCompleteTextView-->
         <!--android:id="@+id/autocomplete_location_search"-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="wrap_content"-->
-        <!--class="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"/>-->
-    <AutoCompleteTextView
-        android:id="@+id/autocomplete_location_search"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:hint="Type Discovering Location"/>
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:hint="Type Discovering Location"/>-->
     <!--<EditText-->
         <!--android:id="@+id/metadata_location_name"-->
         <!--android:layout_width="match_parent"-->

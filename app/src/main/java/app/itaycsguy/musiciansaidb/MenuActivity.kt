@@ -3,65 +3,40 @@ package app.itaycsguy.musiciansaidb
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.Fragment
-import android.app.ProgressDialog
-import android.app.ProgressDialog.show
 import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Path
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
-import android.os.SystemClock.sleep
 import android.provider.MediaStore
-import android.support.annotation.NonNull
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.TextInputEditText
 import android.support.v4.app.ActivityCompat
-import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v4.content.ContextCompat
-import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.text.InputType
 import android.util.Log
 import android.view.*
 import android.widget.*
-import com.google.android.gms.auth.api.Auth
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import app.itaycsguy.musiciansaidb.R.string.search
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Status
-import com.google.android.gms.internal.measurement.zzsl.init
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.places.AutocompleteFilter
-import com.google.android.gms.location.places.AutocompletePrediction
 import com.google.android.gms.location.places.Place
-import com.google.android.gms.location.places.Places
-import com.google.android.gms.location.places.ui.PlaceAutocomplete
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment
 import com.google.android.gms.location.places.ui.PlaceSelectionListener
 import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
+import com.google.android.gms.maps.GoogleMap
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import com.yalantis.ucrop.UCrop
-import eu.janmuller.android.simplecropimage.CropImage
 import java.io.File
 import java.lang.Exception
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
@@ -88,7 +63,8 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
 
     private var _imageHashPath : String? = null
     private var _placesLocation : String? = null
-    private lateinit var _chordsSpinner : Spinner
+    private lateinit var _notesSpinner : Spinner
+//    private lateinit var _countriesSpinner : AutoCompleteTextView
 
     /*
     Const values for result
@@ -156,50 +132,12 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
             if(_imageHashPath == null) {
                 Toast.makeText(this, "Upload an image at first!", Toast.LENGTH_LONG).show()
             } else {
-                val builder = buildMetadataDialog()
-                builder.show()
-//                builder.findViewById<AutoCompleteTextView>(R.id.autocomplete_location_search)
-//                        .setAdapter(ArrayAdapter<String>(this,R.layout.activity_metadata,resources.getStringArray(R.array.countries_array)))
-
+                buildMetadataDialog()
             }
         }
     }
 
     private fun buildMetadataDialog() : AlertDialog{
-//        add dropdown field:
-//        ===================
-//        _chordsSpinner = findViewById(R.id.metadata_chord_name)
-//        val chordsArray = Arrays.asList(resources.getStringArray(R.array.chords_array))
-//        val dataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, chordsArray)
-//        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//        _chordsSpinner.adapter = dataAdapter
-//        findViewById<Spinner>(R.id.metadata_chord_name).onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-//            override fun onNothingSelected(p0: AdapterView<*>?) {
-//                Toast.makeText(currAct,"$p0",Toast.LENGTH_LONG).show()
-//            }
-//
-//            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-//                Toast.makeText(currAct,"$p0,$p1,$p2,$p3",Toast.LENGTH_LONG).show()
-//            }
-//
-//        }
-//        add google places search field:
-//        ===============================
-//        val places = supportFragmentManager.findFragmentById(R.id.autocomplete_location_search)
-//                as SupportPlaceAutocompleteFragment?
-//        val typeFilter = AutocompleteFilter.Builder()
-//                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
-//                .build()
-//        places?.setFilter(typeFilter)
-//        places?.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-//            override fun onPlaceSelected(place: Place) {
-//                Toast.makeText(applicationContext, place.name, Toast.LENGTH_SHORT).show()
-//            }
-//
-//            override fun onError(status: Status) {
-//                Toast.makeText(applicationContext, status.toString(), Toast.LENGTH_SHORT).show()
-//            }
-//        })
         val currAct = this
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Image-Metadata")
@@ -213,7 +151,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                                     val map = HashMap<String,String>()
                                     map["email"] = FirebaseDB.encodeUserEmail(_user.getEmail())
                                     map["writer"] = findViewById<EditText>(R.id.metadata_writer).toString()
-                                    map["chord_name"] = findViewById<EditText>(R.id.metadata_chord_name).toString()
+                                    map["chord_name"] = findViewById<EditText>(R.id.metadata_note_name).toString()
                                     map["location"] = _placesLocation.toString()
                                     map["upload_time"] = (System.currentTimeMillis()/1000).toString()
                                     try {
@@ -234,10 +172,69 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                             }
                         }) }
                 }
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.cancel()
+            .setNegativeButton("Cancel") { dialog, _ ->
+                layoutInflater.inflate(R.layout.menu_activity,null)
+                dialog.cancel()
         }
-        return builder.create()
+        val alertDialog = builder.create()
+        alertDialog.show()
+//        add dropdown field:
+//        ===================
+        _notesSpinner = alertDialog.findViewById(R.id.metadata_note_name)
+        val chordsArray = resources.getStringArray(R.array.notes_array)
+        val dataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, chordsArray)
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        _notesSpinner.adapter = dataAdapter
+        alertDialog.findViewById<Spinner>(R.id.metadata_note_name).onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(p0: AdapterView<*>?) { Toast.makeText(currAct,"$p0",Toast.LENGTH_LONG).show() }
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                Toast.makeText(currAct,"$p0,$p1,$p2,$p3",Toast.LENGTH_LONG).show()
+            }
+
+        }
+//        add google places search field:
+//        ===============================
+        alertDialog.findViewById<Button>(R.id.google_maps).setOnClickListener { _ ->
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Google-Places-Search")
+                    .setView(layoutInflater.inflate(R.layout.activity_google_search,null))
+                    .setPositiveButton("OK") { _, _ ->
+
+                    }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    layoutInflater.inflate(R.layout.menu_activity,null)
+                    dialog.cancel()
+            }
+            val alertDialog = builder.create()
+            alertDialog.show()
+            val places = supportFragmentManager.findFragmentById(R.id.google_autocomplete_location_search)
+                    as SupportPlaceAutocompleteFragment?
+            val typeFilter = AutocompleteFilter
+                    .Builder()
+                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                    .build()
+            places?.let {
+                it.setFilter(typeFilter)
+                it.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+                    override fun onPlaceSelected(place: Place) {
+                        Toast.makeText(applicationContext, place.name, Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onError(status: Status) {
+                        Toast.makeText(applicationContext, status.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                })
+            }
+        }
+//        add places autocomplete search field using local dataset:
+//        =========================================================
+//        _countriesSpinner = alertDialog.findViewById(R.id.autocomplete_location_search)
+//        val countriesArray = resources.getStringArray(R.array.countries_array)
+//        val countriesAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, countriesArray)
+//        _countriesSpinner.setAdapter(countriesAdapter)
+//        _countriesSpinner.threshold = 4
+        return alertDialog
     }
 
     private fun setTempFile() {
@@ -302,11 +299,11 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                     throw UCrop.getError(data!!)!!
                 }
             }
-            PLACE_AUTOCOMPLETE_REQUEST_CODE -> {
-                val place = PlaceAutocomplete.getPlace(this, data)
-                _placesLocation = place.toString()
-                Toast.makeText(this, _placesLocation, Toast.LENGTH_SHORT).show()
-            }
+//            PLACE_AUTOCOMPLETE_REQUEST_CODE -> {
+//                val place = PlaceAutocomplete.getPlace(this, data)
+//                _placesLocation = place.toString()
+//                Toast.makeText(this, _placesLocation, Toast.LENGTH_SHORT).show()
+//            }
         }
 
     }
