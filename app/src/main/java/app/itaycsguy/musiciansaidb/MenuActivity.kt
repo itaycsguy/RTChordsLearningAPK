@@ -3,8 +3,11 @@ package app.itaycsguy.musiciansaidb
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Fragment
 import android.app.ProgressDialog
+import android.app.ProgressDialog.show
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -27,10 +30,24 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.text.InputType
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.*
+import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.Status
+import com.google.android.gms.internal.measurement.zzsl.init
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.places.AutocompleteFilter
+import com.google.android.gms.location.places.AutocompletePrediction
+import com.google.android.gms.location.places.Place
+import com.google.android.gms.location.places.Places
+import com.google.android.gms.location.places.ui.PlaceAutocomplete
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment
+import com.google.android.gms.location.places.ui.PlaceSelectionListener
+import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
@@ -44,11 +61,13 @@ import eu.janmuller.android.simplecropimage.CropImage
 import java.io.File
 import java.lang.Exception
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+
 
 @Suppress("NAME_SHADOWING")
 @SuppressLint("ByteOrderMark", "Registered")
-class MenuActivity() : AppCompatActivity(), Parcelable {
+class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnectionFailedListener {
     /*
     Variables of the activity
      */
@@ -68,10 +87,13 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     private lateinit var cropIntent : Intent
 
     private var _imageHashPath : String? = null
+    private var _placesLocation : String? = null
+    private lateinit var _chordsSpinner : Spinner
 
     /*
     Const values for result
      */
+    private val PLACE_AUTOCOMPLETE_REQUEST_CODE = 201
     private val REQUEST_GALLERY_IMAGE = 100
     private val TAG = "Permissions"
     private val REQUEST_IMAGE_CAPTURE = 0
@@ -81,6 +103,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
     private var uri: Uri? = null
     private lateinit var takePictureIntent: Intent
 
+    @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Firebase Init:
@@ -103,54 +126,8 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         uploadButton = findViewById(R.id.UploadButton)
         currentImage = findViewById(R.id.UploadedView)
         toolbar = findViewById(R.id.toolbar)
-        toolbar.title = ("Choose Operation")
+        toolbar.title = ("My Operations")
         setSupportActionBar(toolbar)
-
-        findViewById<FloatingActionButton>(R.id.metaDataButton).setOnClickListener { _ ->
-            if(_imageHashPath == null) {
-                Toast.makeText(this, "Upload an image at first!", Toast.LENGTH_LONG).show()
-            } else {
-                val builder = AlertDialog.Builder(this)
-                builder.setTitle("Image-Metadata")
-                // Set up the input
-                val input = EditText(this)
-                input.inputType = InputType.TYPE_CLASS_TEXT
-                builder.setView(input)
-                val currAct = this
-                builder.setPositiveButton("OK") { _, _ ->
-                    (_firebaseDB.getRef())?.let {
-                        val progressBar = startProgressBar(this,R.id.login_progressBar)
-                        it.child("temp_images_metadata/$_imageHashPath").ref.addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(p0: DataSnapshot) {
-                                if (p0.exists()) {
-                                    val map = HashMap<String,String>()
-                                    map["email"] = FirebaseDB.encodeUserEmail(_user.getEmail())
-                                    map["writer"] = findViewById<TextInputEditText>(R.id.metadata_writer).toString()
-                                    map["chord_name"] = findViewById<TextInputEditText>(R.id.metadata_chord_name).toString()
-                                    map["location"] = findViewById<TextInputEditText>(R.id.metadata_location_name).toString()
-                                    map["upload_time"] = (System.currentTimeMillis()/1000).toString()
-                                    try {
-                                        //_firebaseDB.writeTempImgMetadata(map)
-                                        Toast.makeText(currAct, "DB was updated successfully!", Toast.LENGTH_LONG).show()
-                                    } catch(e : Exception){
-                                        Toast.makeText(currAct, "Could not meet an updating", Toast.LENGTH_LONG).show()
-                                    }
-                                } else {
-                                    Log.i(TAG, "Weird problem is occurred.")
-                                }
-                                stopProgressBar(progressBar)
-                            }
-
-                            override fun onCancelled(p0: DatabaseError) {
-                                stopProgressBar(progressBar)
-                                CustomSnackBar.make(currAct,  "Data corruption!")
-                            }
-                        }) }
-                }
-                builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
-                builder.show()
-            }
-        }
 
         val permissionCameraCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
         val permissionWriteCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -175,7 +152,92 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
             }
             Toast.makeText(this, infoText, Toast.LENGTH_LONG).show()
         }
+        findViewById<FloatingActionButton>(R.id.metaDataButton).setOnClickListener { _ ->
+            if(_imageHashPath == null) {
+                Toast.makeText(this, "Upload an image at first!", Toast.LENGTH_LONG).show()
+            } else {
+                val builder = buildMetadataDialog()
+                builder.show()
+//                builder.findViewById<AutoCompleteTextView>(R.id.autocomplete_location_search)
+//                        .setAdapter(ArrayAdapter<String>(this,R.layout.activity_metadata,resources.getStringArray(R.array.countries_array)))
 
+            }
+        }
+    }
+
+    private fun buildMetadataDialog() : AlertDialog{
+//        add dropdown field:
+//        ===================
+//        _chordsSpinner = findViewById(R.id.metadata_chord_name)
+//        val chordsArray = Arrays.asList(resources.getStringArray(R.array.chords_array))
+//        val dataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, chordsArray)
+//        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//        _chordsSpinner.adapter = dataAdapter
+//        findViewById<Spinner>(R.id.metadata_chord_name).onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+//            override fun onNothingSelected(p0: AdapterView<*>?) {
+//                Toast.makeText(currAct,"$p0",Toast.LENGTH_LONG).show()
+//            }
+//
+//            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+//                Toast.makeText(currAct,"$p0,$p1,$p2,$p3",Toast.LENGTH_LONG).show()
+//            }
+//
+//        }
+//        add google places search field:
+//        ===============================
+//        val places = supportFragmentManager.findFragmentById(R.id.autocomplete_location_search)
+//                as SupportPlaceAutocompleteFragment?
+//        val typeFilter = AutocompleteFilter.Builder()
+//                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+//                .build()
+//        places?.setFilter(typeFilter)
+//        places?.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+//            override fun onPlaceSelected(place: Place) {
+//                Toast.makeText(applicationContext, place.name, Toast.LENGTH_SHORT).show()
+//            }
+//
+//            override fun onError(status: Status) {
+//                Toast.makeText(applicationContext, status.toString(), Toast.LENGTH_SHORT).show()
+//            }
+//        })
+        val currAct = this
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Image-Metadata")
+                .setView(layoutInflater.inflate(R.layout.activity_metadata,null))
+                .setPositiveButton("OK") { _, _ ->
+                    (_firebaseDB.getRef())?.let {
+                        val progressBar = startProgressBar(currAct,R.id.progressBar)
+                        it.child("temp_images_metadata/$_imageHashPath").ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(p0: DataSnapshot) {
+                                if (p0.exists() && _placesLocation != null) {
+                                    val map = HashMap<String,String>()
+                                    map["email"] = FirebaseDB.encodeUserEmail(_user.getEmail())
+                                    map["writer"] = findViewById<EditText>(R.id.metadata_writer).toString()
+                                    map["chord_name"] = findViewById<EditText>(R.id.metadata_chord_name).toString()
+                                    map["location"] = _placesLocation.toString()
+                                    map["upload_time"] = (System.currentTimeMillis()/1000).toString()
+                                    try {
+                                        //_firebaseDB.writeTempImgMetadata(map)
+                                        Toast.makeText(currAct, "DB was updated successfully!", Toast.LENGTH_LONG).show()
+                                    } catch(e : Exception){
+                                        Toast.makeText(currAct, "Could not meet an updating", Toast.LENGTH_LONG).show()
+                                    }
+                                } else {
+                                    Log.i(TAG, "Weird problem is occurred.")
+                                }
+                                stopProgressBar(progressBar)
+                            }
+
+                            override fun onCancelled(p0: DatabaseError) {
+                                stopProgressBar(progressBar)
+                                CustomSnackBar.make(currAct,  "Data corruption!")
+                            }
+                        }) }
+                }
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+        return builder.create()
     }
 
     private fun setTempFile() {
@@ -239,6 +301,11 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
                 } else if (resultCode == UCrop.RESULT_ERROR) {
                     throw UCrop.getError(data!!)!!
                 }
+            }
+            PLACE_AUTOCOMPLETE_REQUEST_CODE -> {
+                val place = PlaceAutocomplete.getPlace(this, data)
+                _placesLocation = place.toString()
+                Toast.makeText(this, _placesLocation, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -362,5 +429,9 @@ class MenuActivity() : AppCompatActivity(), Parcelable {
         override fun newArray(size: Int): Array<MenuActivity?> {
             return arrayOfNulls(size)
         }
+    }
+
+    override fun onConnectionFailed(p0: ConnectionResult) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

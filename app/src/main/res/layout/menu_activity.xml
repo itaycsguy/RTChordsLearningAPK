@@ -51,7 +51,7 @@
             android:id="@+id/metaDataButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentEnd="false"
             android:layout_alignParentBottom="true"
             android:layout_gravity="end|left"
             android:layout_margin="@dimen/_16sdp"
@@ -61,7 +61,7 @@
             app:backgroundTint="@android:color/holo_blue_dark"
             app:elevation="0dp"
             app:fabSize="normal"
-            app:srcCompat="@android:drawable/ic_menu_upload" />
+            app:srcCompat="@android:drawable/ic_menu_edit" />
 
         <ProgressBar
             android:id="@+id/progressBar"

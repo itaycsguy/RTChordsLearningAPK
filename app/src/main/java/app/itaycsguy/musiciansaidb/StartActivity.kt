@@ -118,7 +118,7 @@ class StartActivity : AppCompatActivity(), Serializable {
         userProfileActivityOnStart(User(_userData))
     }
 
-    fun userProfileActivityOnStart(user : User){
+    private fun userProfileActivityOnStart(user : User){
         val intent = Intent(this, ProfileActivity::class.java)
         intent.putExtra("user",user.getHashDetails())
         findViewById<ProgressBar>(R.id.login_progressBar).visibility = View.INVISIBLE
