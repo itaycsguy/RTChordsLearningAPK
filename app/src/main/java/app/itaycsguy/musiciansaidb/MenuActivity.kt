@@ -14,7 +14,9 @@ import android.os.*
 import android.provider.MediaStore
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.text.InputType
@@ -121,14 +123,16 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
 
 
         uploadButton.setOnClickListener {
-            uploadImage()
-            val infoText: String = if (_user.getPermission().toLowerCase() == User.BASIC_PERMISSION){
-                "The Image is pending for approval before entering our database, thanks for your support"
-            } else {
-                //TODO: change the user's permission to be an enum with the different permissions and address them all here.
-                "The Image is automatically approved since you possess the right permission level"
-            }
-            Toast.makeText(this, infoText, Toast.LENGTH_LONG).show()
+            if(uri != null) {
+                uploadImage()
+                val infoText: String = if (_user.getPermission().toLowerCase() == User.BASIC_PERMISSION) {
+                    "The Image is pending for approval before entering our database, thanks for your support"
+                } else {
+                    //TODO: change the user's permission to be an enum with the different permissions and address them all here.
+                    "The Image is automatically approved since you possess the right permission level"
+                }
+                Toast.makeText(this, infoText, Toast.LENGTH_LONG).show()
+            } else { Toast.makeText(this, "Pick an image prior to uploading operation!", Toast.LENGTH_LONG).show() }
         }
         findViewById<FloatingActionButton>(R.id.metaDataButton).setOnClickListener { _ ->
             if(_imageHashPath == null) {
@@ -146,29 +150,29 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                 .setView(layoutInflater.inflate(R.layout.activity_metadata,null))
                 .setPositiveButton("OK") { _, _ ->
                     (_firebaseDB.getRef())?.let {
-                        val progressBar = startProgressBar(currAct,R.id.progressBar)
-                        it.child("temp_images_metadata/$_imageHashPath").ref.addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(p0: DataSnapshot) {
-                                if (p0.exists() && _placesLocation != null && _notesName != null) {
-                                    val map = HashMap<String,String>()
-                                    map["email"] = FirebaseDB.encodeUserEmail(_user.getEmail())
-                                    map["writer"] = _alertDialog.findViewById<EditText>(R.id.metadata_writer).toString()
-                                    map["note_name"] = _notesName.toString()
-                                    map["location"] = _placesLocation.toString()
-                                    map["upload_time"] = (System.currentTimeMillis()/1000).toString()
-                                    try {
-                                        _firebaseDB.writeTempImagesMetadata(_imageHashPath.toString(),map)
-                                        Toast.makeText(currAct, "DB was updated successfully!", Toast.LENGTH_LONG).show()
-                                    } catch(e : Exception){ Toast.makeText(currAct, "Could not meet an updating", Toast.LENGTH_LONG).show() }
-                                } else { Log.i(TAG, "Weird problem is occurred.") }
-                                stopProgressBar(progressBar)
+                        val progressBar = startProgressBar(currAct, R.id.progressBar)
+                        try {
+                            _storageReference.child("${FirebaseDB.IMAGES_DB}/${FirebaseDB.TEMP_IMAGES}/$_imageHashPath")
+                            val writerName = _alertDialog.findViewById<EditText>(R.id.metadata_writer).text.toString()
+                            if (!writerName.isEmpty() && _placesLocation != null && _notesName != null) {
+                                val map = HashMap<String, String>()
+                                map["email"] = FirebaseDB.encodeUserEmail(_user.getEmail())
+                                map["writer"] = _alertDialog.findViewById<EditText>(R.id.metadata_writer).text.toString()
+                                map["note_name"] = _notesName.toString()
+                                map["location"] = _placesLocation.toString()
+                                map["upload_time"] = (System.currentTimeMillis()/1000).toString()
+                                try {
+                                    _firebaseDB.writeTempImagesMetadata(_imageHashPath.toString(), map)
+                                    Toast.makeText(currAct, "DB was updated successfully!", Toast.LENGTH_LONG).show()
+                                } catch (e: Exception) {
+                                    Toast.makeText(currAct, "Could not meet an updating", Toast.LENGTH_LONG).show()
+                                }
+                            } else {
+                                Toast.makeText(currAct, "All fields are required to be filled.", Toast.LENGTH_LONG).show()
                             }
-
-                            override fun onCancelled(p0: DatabaseError) {
-                                stopProgressBar(progressBar)
-                                CustomSnackBar.make(currAct,  "Data corruption!")
-                            }
-                        }) }
+                        } catch(e : Exception) { Toast.makeText(currAct, "Image is missing from DB.", Toast.LENGTH_LONG).show() }
+                        stopProgressBar(progressBar)
+                    }
                 }
             .setNegativeButton("Cancel") { dialog, _ ->
                 layoutInflater.inflate(R.layout.menu_activity,null)

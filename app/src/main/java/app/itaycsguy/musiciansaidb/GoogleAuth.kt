@@ -3,6 +3,7 @@ package app.itaycsguy.musiciansaidb
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import app.itaycsguy.musiciansaidb.R.id.progressBar
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -10,6 +11,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import java.lang.Exception
 
 
 class GoogleAuth(act : AppCompatActivity) : GoogleApiClient.OnConnectionFailedListener {
@@ -64,13 +69,40 @@ class GoogleAuth(act : AppCompatActivity) : GoogleApiClient.OnConnectionFailedLi
             val account = (result.signInAccount as GoogleSignInAccount) // TODO: need to understand how to check if google image is uploaded by the user or picked randomly by the provider
             val map : HashMap<String,String> = HashMap()
             map["user_name"] = account.displayName.toString()
-            map["email"] = account.email.toString()
+            val email = account.email.toString()
+            map["email"] = email
             map["photo"] = account.photoUrl.toString()
             map["given_name"] = account.givenName.toString()
             map["family_name"] = account.familyName.toString()
             map["authentication_vendor"] = "Google"
-            map["permission"] = "Anonymous"
+            val ref = FirebaseDB().getRef()
+            ref?.let {
+                // TODO: change it to check the permission on fetching data time:
+                val permissionValue = it
+                        .child("users/${FirebaseDB.encodeUserEmail(email)}/permission")
+                        .equalTo("Anonymous").toString()
+                Toast.makeText(_act, permissionValue, Toast.LENGTH_LONG).show()
+                if (permissionValue.isEmpty()) {
+                    map["permission"] = "Anonymous"
+                }
+            }
             _userData = map
+//            TODO: make this changing asynchronous:
+//            (FirebaseDB().getRef())!!
+//                    .child("users/${FirebaseDB.encodeUserEmail(email)}").addListenerForSingleValueEvent(object : ValueEventListener {
+//                    .addListenerForSingleValueEvent(object : ValueEventListener {
+//                override fun onCancelled(p0: DatabaseError) {}
+//
+//                override fun onDataChange(p0: DataSnapshot) {
+//                    if(p0.exists()) {
+//                        map["permission"] = p0.value.toString()
+//                    } else {
+//                        map["permission"] = "Anonymous"
+//                        _userData = map
+//                    }
+//                }
+//
+//            })
         }
     }
 
