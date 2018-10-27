@@ -1,8 +1,9 @@
 package app.itaycsguy.musiciansaidb
 
+import android.util.Log
 import android.widget.ImageView
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import android.widget.Toast
+import com.google.firebase.database.*
 
 class FirebaseDB {
     private val _firebaseDB : FirebaseDatabase = FirebaseDatabase.getInstance()

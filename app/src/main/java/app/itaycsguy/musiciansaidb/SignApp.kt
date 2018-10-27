@@ -26,7 +26,8 @@ import java.util.*
 import kotlin.collections.HashMap
 
 
-class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),TextWatcher {
+@Suppress("NAME_SHADOWING", "NAME_SHADOWING")
+class SignApp(act : AppCompatActivity, fbDb : FirebaseDB) : AppCompatActivity(),TextWatcher {
     private val STD_PASSWORD_TYPE = 129
     private val MIN_STRENGTH_PASSWORD = 0.4
     private val REQUEST_CODE = 2
@@ -37,11 +38,11 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
     private lateinit var _signUpBtn : Button
     private var _imageView: ImageView? = null
     private var _photoPath : Uri? = null
-    private var _fieldMetaHash : HashMap<String,Boolean> = HashMap<String,Boolean>()
+    private var _fieldMetaHash : HashMap<String,Boolean> = HashMap()
     private lateinit var _signUpResult : HashMap<String,String>
     companion object {
         private val NUM_OF_INPUT_FIELDS = 6
-        private val IMAGE_DIRECTORY = "/UserProfileImage"
+        private val IMAGE_DIRECTORY = "/User_Profile_Images"
     }
 
     fun initOperations() {
@@ -73,8 +74,8 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
             }
             if(detValue && _fieldMetaHash.values.size == NUM_OF_INPUT_FIELDS && _photoPath != null) {
                 val email = (_act.findViewById<EditText>(R.id.registiration_email)).text.toString()
-                val givenname = (_act.findViewById<EditText>(R.id.registiration_givenname)).text.toString()
-                val familyname = (_act.findViewById<EditText>(R.id.registiration_family_name)).text.toString()
+                val givenName = (_act.findViewById<EditText>(R.id.registiration_givenname)).text.toString()
+                val familyName = (_act.findViewById<EditText>(R.id.registiration_family_name)).text.toString()
                 val username = (_act.findViewById<EditText>(R.id.registiration_username)).text.toString()
                 val password = (_act.findViewById<EditText>(R.id.registiration_password)).text.toString()
                 val photo = _photoPath.toString()
@@ -83,14 +84,14 @@ class SignApp(act : AppCompatActivity,fbDb : FirebaseDB) : AppCompatActivity(),T
                         if (!p0.exists()) {
                             CustomSnackBar.make(_act, "Registered!")
                             val map: HashMap<String, String> = HashMap()
-                            map["authentication_vendor"] = "app"
+                            map["authentication_vendor"] = "App"
                             map["user_name"] = username
-                            map["given_name"] = givenname
-                            map["family_name"] = familyname
+                            map["given_name"] = givenName
+                            map["family_name"] = familyName
                             map["password"] = password
                             map["email"] = email
                             map["photo"] = photo
-                            map["permission"] = "anonymous"
+                            map["permission"] = "Anonymous"
                             val intent = _act.intent
                             intent.putExtra("data", map)
                             _act.onActivityResultWrapper(REQUEST_CODE, intent)
