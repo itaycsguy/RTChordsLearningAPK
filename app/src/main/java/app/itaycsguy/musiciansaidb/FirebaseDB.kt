@@ -1,8 +1,5 @@
 package app.itaycsguy.musiciansaidb
 
-import android.util.Log
-import android.widget.ImageView
-import android.widget.Toast
 import com.google.firebase.database.*
 
 class FirebaseDB {
@@ -14,14 +11,9 @@ class FirebaseDB {
 
         fun encodeUserEmail(email : String) : String {
             val emailParts : List<String> = email.split("@")
+            val firstPart = emailParts[0].replace(".","_")
             val secondPart = emailParts[1].replace(".","_")
-            return emailParts[0] + "_" + secondPart
-        }
-
-        fun decodeUserEmail(email : String) : String {
-            val emailParts : List<String> = email.split("_")
-            val secondPart = emailParts[1].replace("_",".")
-            return emailParts[0] + "@" + secondPart
+            return firstPart + "_" + secondPart
         }
     }
 
@@ -40,21 +32,5 @@ class FirebaseDB {
     fun writeTempImagesMetadata(key : String, map : HashMap<String,String>){
         val tempImgsMetadataEntry = _firebaseDB.getReference("temp_images_metadata/$key")
         tempImgsMetadataEntry.setValue(map)
-    }
-
-    fun writeVerifiedImagesMetadata(key : String, map : HashMap<String,String>){
-        val verifiedImgsMetadataEntry = _firebaseDB.getReference("verified_images_metadata/$key")
-        verifiedImgsMetadataEntry.setValue(map)
-    }
-
-    fun writeTempImg(img : ImageView){
-        val userEntry = _firebaseDB.getReference("temp_img")
-//        System.err.println("the drawable object looks like this: ${img.drawable}")
-//        userEntry.setValue(img.drawable)
-    }
-
-    fun writeImg(img : ImageView){
-        val userEntry = _firebaseDB.getReference("verified_img")
-        userEntry.setValue(img.drawable)
     }
 }

@@ -1,7 +1,6 @@
 package app.itaycsguy.musiciansaidb
 
 import android.app.Activity
-import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
