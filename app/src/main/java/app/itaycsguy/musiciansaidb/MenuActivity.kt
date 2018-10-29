@@ -68,7 +68,9 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
     private var _imageHashPath : String? = null
     private var _placesLocation : String? = null
     private var _notesName : String? = null
+    private var _writersName : String? = null
     private lateinit var _alertDialog : AlertDialog
+    private var _isMetadataEnable : Boolean = false
 
     /*
     Const values for result
@@ -125,21 +127,13 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
         uploadButton.setOnClickListener {
             if(uri != null) {
                 uploadImage()
-                val infoText: String = if (_user.getPermission().toLowerCase() == User.BASIC_PERMISSION) {
-                    "The Image is pending for approval before entering our database, thanks for your support"
-                } else {
-                    //TODO: change the user's permission to be an enum with the different permissions and address them all here.
-                    "The Image is automatically approved since you possess the right permission level"
-                }
-                Toast.makeText(this, infoText, Toast.LENGTH_LONG).show()
-            } else { Toast.makeText(this, "Pick an image prior to uploading operation!", Toast.LENGTH_LONG).show() }
+            } else {
+                Toast.makeText(this, "Pick an image prior to uploading operation!", Toast.LENGTH_LONG).show()
+            }
         }
         findViewById<FloatingActionButton>(R.id.metaDataButton).setOnClickListener { _ ->
-            if(_imageHashPath == null) {
-                Toast.makeText(this, "Upload an image at first!", Toast.LENGTH_LONG).show()
-            } else {
-                buildMetadataDialog()
-            }
+            if(uri == null){ Toast.makeText(this, "Pick an image prior to metadata settings!", Toast.LENGTH_LONG).show() }
+            else{ buildMetadataDialog() }
         }
     }
 
@@ -149,30 +143,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
         builder.setTitle("Current-Image-Metadata")
                 .setView(layoutInflater.inflate(R.layout.activity_metadata,null))
                 .setPositiveButton("OK") { _, _ ->
-                    (_firebaseDB.getRef())?.let {
-                        val progressBar = startProgressBar(currAct, R.id.progressBar)
-                        try {
-                            _storageReference.child("${FirebaseDB.IMAGES_DB}/${FirebaseDB.TEMP_IMAGES}/$_imageHashPath")
-                            val writerName = _alertDialog.findViewById<EditText>(R.id.metadata_writer).text.toString()
-                            if (!writerName.isEmpty() && _placesLocation != null && _notesName != null) {
-                                val map = HashMap<String, String>()
-                                map["email"] = FirebaseDB.encodeUserEmail(_user.getEmail())
-                                map["writer"] = _alertDialog.findViewById<EditText>(R.id.metadata_writer).text.toString()
-                                map["note_name"] = _notesName.toString()
-                                map["location"] = _placesLocation.toString()
-                                map["upload_time"] = (System.currentTimeMillis()/1000).toString()
-                                try {
-                                    _firebaseDB.writeTempImagesMetadata(_imageHashPath.toString(), map)
-                                    Toast.makeText(currAct, "DB was updated successfully!", Toast.LENGTH_LONG).show()
-                                } catch (e: Exception) {
-                                    Toast.makeText(currAct, "Could not meet an updating", Toast.LENGTH_LONG).show()
-                                }
-                            } else {
-                                Toast.makeText(currAct, "All fields are required to be filled.", Toast.LENGTH_LONG).show()
-                            }
-                        } catch(e : Exception) { Toast.makeText(currAct, "Image is missing from DB.", Toast.LENGTH_LONG).show() }
-                        stopProgressBar(progressBar)
-                    }
+                    Toast.makeText(this, "Keeped Selections!", Toast.LENGTH_LONG).show()
                 }
             .setNegativeButton("Cancel") { dialog, _ ->
                 layoutInflater.inflate(R.layout.menu_activity,null)
@@ -180,6 +151,45 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
         }
         _alertDialog = builder.create()
         _alertDialog.show()
+//      add dropdown field:
+//      ===================
+        val writerSpinner : Spinner = _alertDialog.findViewById(R.id.metadata_writer)
+        val writersArray = resources.getStringArray(R.array.writers_array)
+        val writerDataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, writersArray)
+        writerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        writerSpinner.adapter = writerDataAdapter
+        _alertDialog.findViewById<Spinner>(R.id.metadata_writer).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                p0?.let {
+                    _writersName = it.getItemAtPosition(p2).toString()
+                    when {
+                            _writersName.equals("Choose Writer Type...") -> {
+                                _writersName = null
+                                it.setSelection(0)
+                        }
+                            _writersName.equals("Special Writer") -> {
+                                _writersName = null
+                                val freeInput = EditText(currAct)
+                                freeInput.hint = "Type Special Writer Name"
+                                freeInput.inputType = InputType.TYPE_CLASS_TEXT
+                                val builder = AlertDialog.Builder(currAct)
+                                builder.setTitle("Special Writer:")
+                                        .setView(freeInput)
+                                        .setPositiveButton("OK") { _, _ ->
+                                            _notesName = freeInput.text.toString()
+                                            Toast.makeText(currAct,"$_notesName",Toast.LENGTH_LONG).show()
+                                        }
+                                builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+                                builder.create().show()
+                            }
+                    }
+                    if(checkMetadataEnable()) { _isMetadataEnable = true }
+                }
+
+            }
+        }
 //        add dropdown field:
 //        ===================
         val notesSpinner : Spinner = _alertDialog.findViewById(R.id.metadata_note_name)
@@ -194,26 +204,27 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                 p0?.let {
                     _notesName = it.getItemAtPosition(p2).toString()
                     when {
-                        _notesName.equals("Choose Note Type...") -> {
-                            _notesName = null
-                            it.setSelection(0)
+                            _notesName.equals("Choose Note Type...") -> {
+                                _notesName = null
+                                it.setSelection(0)
                         }
-                        _notesName.equals("Special Note") -> {
-                            _notesName = null
-                            val freeInput = EditText(currAct)
-                            freeInput.hint = "Type Special Note Name"
-                            freeInput.inputType = InputType.TYPE_CLASS_TEXT
-                            val builder = AlertDialog.Builder(currAct)
-                            builder.setTitle("Special Note:")
-                                .setView(freeInput)
-                                .setPositiveButton("OK") { _, _ ->
-                                    _notesName = freeInput.text.toString()
-                                    Toast.makeText(currAct,"$_notesName",Toast.LENGTH_LONG).show()
+                            _notesName.equals("Special Note") -> {
+                                _notesName = null
+                                val freeInput = EditText(currAct)
+                                freeInput.hint = "Type Special Note Name"
+                                freeInput.inputType = InputType.TYPE_CLASS_TEXT
+                                val builder = AlertDialog.Builder(currAct)
+                                builder.setTitle("Special Note:")
+                                    .setView(freeInput)
+                                    .setPositiveButton("OK") { _, _ ->
+                                        _notesName = freeInput.text.toString()
+                                        Toast.makeText(currAct,"$_notesName",Toast.LENGTH_LONG).show()
+                                    }
+                                builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+                                builder.create().show()
                             }
-                            builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
-                            builder.create().show()
-                        }
                     }
+                    if(checkMetadataEnable()) { _isMetadataEnable = true }
                 }
 
             }
@@ -304,10 +315,18 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                     val locationField = _alertDialog.findViewById<TextView>(R.id.google_location_name)
                     locationField.text = _placesLocation
                     locationField.gravity = Gravity.LEFT
+                    if(checkMetadataEnable()) { _isMetadataEnable = true }
                 }
             }
         }
 
+    }
+
+    private fun checkMetadataEnable() : Boolean {
+        if(_writersName != null &&
+                _placesLocation != null &&
+                _notesName != null) return true
+        return false
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -336,7 +355,14 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
 
 
     private fun uploadImage() {
-        if (uri != null){
+        if (uri != null && _isMetadataEnable){
+            val infoText: String = if (_user.getPermission().toLowerCase() == User.BASIC_PERMISSION) {
+                "The Image is pending for approval before entering our database, thanks for your support"
+            } else {
+                //TODO: change the user's permission to be an enum with the different permissions and address them all here.
+                "The Image is automatically approved since you possess the right permission level"
+            }
+            Toast.makeText(this, infoText, Toast.LENGTH_LONG).show()
             val progressBar : ProgressBar = findViewById(R.id.progressBar)
             progressBar.indeterminateDrawable.setColorFilter(Color.DKGRAY, android.graphics.PorterDuff.Mode.MULTIPLY)
             progressBar.visibility = View.VISIBLE  //To show ProgressBar
@@ -348,6 +374,8 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                             _imageHashPath)
             ref.putFile(uri!!)
                     .addOnSuccessListener {
+                        writeImageMetadata()
+                        uri = null
                         progressBar.visibility = View.GONE     // To Hide ProgressBar
                     }
                     .addOnFailureListener{
@@ -357,15 +385,20 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                     .addOnProgressListener{
                         progressBar.progress = (100.0*it.bytesTransferred/it.totalByteCount).toInt()
                     }
+        } else if(uri == null) {
+            Toast.makeText(this, "Pick an image prior to uploading operation!", Toast.LENGTH_LONG).show()
+        } else if(!_isMetadataEnable){
+            Toast.makeText(this,"In order to upload you must provide the image's metadata.", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this,"In order to upload you need to first pick a picture.", Toast.LENGTH_SHORT).show()
         }
-        else{ Toast.makeText(this,"In order to upload you need to first pick a picture", Toast.LENGTH_SHORT).show() }
     }
 
     private fun openCrop(){
         try {
             //First we check if there was a picture picked and the wanted crop isn't on the filler.
             if (uri == null) {
-              Toast.makeText(this,"In order to crop you need to first pick a picture", Toast.LENGTH_SHORT).show()
+              Toast.makeText(this,"In order to crop you need to first pick a picture.", Toast.LENGTH_SHORT).show()
             }
             else {
                 UCrop.of(uri!!, uri!!)
@@ -426,6 +459,37 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
         override fun newArray(size: Int): Array<MenuActivity?> {
             return arrayOfNulls(size)
         }
+    }
+
+    private fun writeImageMetadata(){
+        val currAct = this
+        (_firebaseDB.getRef())?.let {
+            val progressBar = startProgressBar(currAct, R.id.progressBar)
+            try {
+                _storageReference.child("${FirebaseDB.IMAGES_DB}/${FirebaseDB.TEMP_IMAGES}/$_imageHashPath")
+                if (_imageHashPath != null) {
+                    val map = HashMap<String, String>()
+                    map["email"] = FirebaseDB.encodeUserEmail(_user.getEmail())
+                    map["writer"] = _writersName.toString()
+                    map["note_name"] = _notesName.toString()
+                    map["location"] = _placesLocation.toString()
+                    map["upload_time"] = (System.currentTimeMillis()/1000).toString()
+                    try {
+                        _firebaseDB.writeTempImagesMetadata(_imageHashPath.toString(), map)
+                        Toast.makeText(currAct, "DB was updated successfully!", Toast.LENGTH_LONG).show()
+                        _writersName = null
+                        _notesName = null
+                        _placesLocation = null
+                    } catch (e: Exception) {
+                        Toast.makeText(currAct, "Could not meet an updating", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Toast.makeText(currAct, "All fields are required to be filled.", Toast.LENGTH_LONG).show()
+                }
+            } catch(e : Exception) { Toast.makeText(currAct, "Image is missing from DB.", Toast.LENGTH_LONG).show() }
+            stopProgressBar(progressBar)
+        }
+        _isMetadataEnable = false
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {}

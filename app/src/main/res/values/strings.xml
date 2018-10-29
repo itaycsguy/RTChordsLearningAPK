@@ -18,6 +18,18 @@
     <string name="title_item_list">Items</string>
     <string name="title_item_detail">Item Detail</string>
     <string name="upload_string_common_google_play_services_enable_button">upload @string/common_google_play_services_enable_button</string>
+    <string-array name="writers_array">
+        <item>Choose Writer Type...</item>
+        <item>Cannot Recognize</item>
+        <item>C</item>
+        <item>D</item>
+        <item>E</item>
+        <item>F</item>
+        <item>G</item>
+        <item>A</item>
+        <item>B</item>
+        <item>Special Writer</item>
+    </string-array>
     <string-array name="notes_array">
         <item>Choose Note Type...</item>
         <item>Cannot Recognize</item>
