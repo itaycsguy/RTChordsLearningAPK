@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -14,30 +13,27 @@ import android.os.*
 import android.provider.MediaStore
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
-import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v4.content.ContextCompat
-import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.text.InputType
 import android.util.Log
-import android.view.*
+import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.*
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.yalantis.ucrop.UCrop
 import java.io.File
-import java.lang.Exception
+import java.io.FileNotFoundException
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
@@ -123,7 +119,6 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
             makeRequest()
         }
 
-
         uploadButton.setOnClickListener {
             if(uri != null) {
                 uploadImage()
@@ -132,7 +127,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
             }
         }
         findViewById<FloatingActionButton>(R.id.metaDataButton).setOnClickListener { _ ->
-            if(uri == null){ Toast.makeText(this, "Pick an image prior to metadata settings!", Toast.LENGTH_LONG).show() }
+            if(uri == null){ Toast.makeText(this, "Pick an image prior to setting it's metadata!", Toast.LENGTH_LONG).show() }
             else{ buildMetadataDialog() }
         }
     }
@@ -143,7 +138,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
         builder.setTitle("Current-Image-Metadata")
                 .setView(layoutInflater.inflate(R.layout.activity_metadata,null))
                 .setPositiveButton("OK") { _, _ ->
-                    Toast.makeText(this, "Keeped Selections!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Kept selections!", Toast.LENGTH_LONG).show()
                 }
             .setNegativeButton("Cancel") { dialog, _ ->
                 layoutInflater.inflate(R.layout.menu_activity,null)
@@ -287,8 +282,23 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
             }
             REQUEST_IMAGE_CAPTURE -> {
                 if ((resultCode == Activity.RESULT_OK)
-                                .and(data != null).or(uri != null) ) {
-                    openCrop()
+                                .and(data != null).or(uri != null)){
+                    if ((data != null).and(uri == null)){
+                        uri = data!!.data
+
+                    }
+                    //uri != null here
+                    //Since canceling taking a picture on some devices will still get us here we will try to set the image to make sure it was taken.
+                    val image = File(uri?.path)
+                    if(image.exists()) {
+                        MediaScannerConnection.scanFile(this, listOf(uri?.path).toTypedArray(), listOf("image/jpeg").toTypedArray(), null)
+                        currentImage.setImageURI(uri)
+                        openCrop()
+                    }
+                    else{//Reaching here or the else below means that the uri is pointing into an empty file location.
+                        uri = null
+                        currentImage.setImageResource(R.drawable.common_full_open_on_phone)
+                    }
                 } else{
                     //Reaching here means that the uri is pointing into an empty file location.
                     uri = null
@@ -324,7 +334,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
 
     private fun checkMetadataEnable() : Boolean {
         if(_writersName != null &&
-                _placesLocation != null &&
+//                _placesLocation != null && //TODO: Add this back once its fixed! - Morag.
                 _notesName != null) return true
         return false
     }
@@ -353,9 +363,8 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
         startActivity(intent)
     }
 
-
     private fun uploadImage() {
-        if (uri != null && _isMetadataEnable){
+        if (_isMetadataEnable){
             val infoText: String = if (_user.getPermission().toLowerCase() == User.BASIC_PERMISSION) {
                 "The Image is pending for approval before entering our database, thanks for your support"
             } else {
@@ -385,12 +394,8 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                     .addOnProgressListener{
                         progressBar.progress = (100.0*it.bytesTransferred/it.totalByteCount).toInt()
                     }
-        } else if(uri == null) {
-            Toast.makeText(this, "Pick an image prior to uploading operation!", Toast.LENGTH_LONG).show()
-        } else if(!_isMetadataEnable){
+        } else if(_isMetadataEnable.not()){
             Toast.makeText(this,"In order to upload you must provide the image's metadata.", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this,"In order to upload you need to first pick a picture.", Toast.LENGTH_SHORT).show()
         }
     }
 
