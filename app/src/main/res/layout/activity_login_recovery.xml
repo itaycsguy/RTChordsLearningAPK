@@ -1,117 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recovery_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@mipmap/sol_key"
-    tools:layout_editor_absoluteY="@dimen/_50sdp">
-
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/common_google_signin_btn_text_dark_disabled"
-    tools:context="app.itaycsguy.musiciansaidb.LoginRecoveryActivity">
+    tools:layout_editor_absoluteY="@dimen/_81sdp"
+    tools:ignore="RtlHardcoded">
 
-    <ProgressBar
-        android:id="@+id/recovery_progressBar"
-        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
-        android:layout_width="@dimen/_116sdp"
-        android:layout_height="@dimen/_133sdp"
-        android:layout_alignStart="@+id/UploadedView"
-        android:layout_alignTop="@+id/UploadedView"
-        android:layout_alignEnd="@+id/UploadedView"
-        android:layout_alignBottom="@+id/UploadedView"
-        android:layout_gravity="center"
-        android:progressDrawable="@android:color/darker_gray"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/text_email_recovery"
-        android:layout_width="@dimen/_306sdp"
-        android:layout_height="@dimen/_39sdp"
-        android:layout_marginStart="@dimen/_8sdp"
-        android:layout_marginTop="@dimen/_8sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
-        android:layout_marginBottom="@dimen/_8sdp"
-        android:background="#CCFFFFFF"
-        android:ems="10"
-        android:fontFamily="serif"
-        android:gravity="center_horizontal"
-        android:hint="Email Address"
-        android:inputType="textEmailAddress"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/_18sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.185"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.427" />
-
-    <Button
-        android:id="@+id/send_recovery_button"
-        android:layout_width="@dimen/_44sdp"
-        android:layout_height="@dimen/_39sdp"
-        android:layout_marginStart="@dimen/_8sdp"
-        android:layout_marginTop="@dimen/_8sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
-        android:layout_marginBottom="@dimen/_8sdp"
-        android:background="@drawable/send_it"
-        android:fontFamily="serif"
-        android:gravity="center_horizontal"
-        android:textColor="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.426" />
-
-    <TextView
-        android:id="@+id/details_recovery_view"
-        android:layout_width="@dimen/_175sdp"
-        android:layout_height="@dimen/_45sdp"
-        android:layout_marginStart="@dimen/_8sdp"
-        android:layout_marginTop="@dimen/_8sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
-        android:layout_marginBottom="@dimen/_8sdp"
-        android:fontFamily="serif"
-        android:gravity="center_horizontal"
-        android:text="Recovery"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/_30sdp"
-        app:layout_constraintBottom_toTopOf="@+id/text_email_recovery"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.397" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="top"
+        tools:ignore="RtlHardcoded">
 
     <Button
         android:id="@+id/cancel_recovery_button"
-        android:layout_width="@dimen/_38sdp"
-        android:layout_height="@dimen/_38sdp"
-        android:layout_marginStart="@dimen/_8sdp"
-        android:layout_marginTop="@dimen/_8sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
         android:background="@drawable/error"
         android:fontFamily="serif"
-        android:gravity="center_horizontal"
+        android:gravity="left"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingStart="@dimen/_10sdp"
         android:textColor="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.029"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.015" />
-</android.support.constraint.ConstraintLayout>
-</LinearLayout>
+        tools:ignore="RtlSymmetry"/>
+
+    <TextView
+        android:id="@+id/details_recovery_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif"
+        android:text="Recovery"
+        android:gravity="center"
+        android:textColor="@color/colorPrimary"
+        android:paddingTop="@dimen/_30sdp"
+        android:textSize="@dimen/_30sdp"
+        tools:ignore="RtlHardcoded"/>
+    </RelativeLayout>
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        tools:ignore="RtlHardcoded">
+        <ProgressBar
+            android:id="@+id/recovery_progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:progressDrawable="@android:color/darker_gray"
+            android:foregroundGravity="center"
+            android:visibility="invisible"
+            tools:ignore="RtlHardcoded"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        tools:ignore="RtlHardcoded">
+
+        <Button
+            android:id="@+id/send_recovery_button"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:layout_alignBaseline="@+id/text_email_recovery"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/send_it"
+            tools:ignore="RtlHardcoded"/>
+
+        <EditText
+            android:id="@+id/text_email_recovery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CCFFFFFF"
+            android:paddingTop="@dimen/_8sdp"
+            android:ems="10"
+            android:fontFamily="serif"
+            android:gravity="center_horizontal|center_vertical"
+            android:hint="Email Address"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/_18sdp"
+            tools:ignore="RtlSymmetry|RtlHardcoded"/>
+    </RelativeLayout>
+</RelativeLayout>

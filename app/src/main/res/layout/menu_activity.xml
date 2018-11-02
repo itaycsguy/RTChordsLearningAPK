@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_gravity="end"
+            android:layout_gravity="end|right"
             android:layout_margin="@dimen/_16sdp"
             android:background="@android:color/holo_blue_dark"
             android:clickable="true"
@@ -46,6 +46,22 @@
             app:elevation="0dp"
             app:fabSize="normal"
             app:srcCompat="@android:drawable/ic_menu_upload" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/metaDataButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="end|left"
+            android:layout_margin="@dimen/_16sdp"
+            android:background="@android:color/holo_blue_dark"
+            android:clickable="true"
+            android:focusable="true"
+            app:backgroundTint="@android:color/holo_blue_dark"
+            app:elevation="0dp"
+            app:fabSize="normal"
+            app:srcCompat="@android:drawable/ic_menu_edit" />
 
         <ProgressBar
             android:id="@+id/progressBar"
