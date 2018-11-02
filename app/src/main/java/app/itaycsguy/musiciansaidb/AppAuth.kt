@@ -76,7 +76,7 @@ class AppAuth(act : AppCompatActivity,fbDb : FirebaseDB) : TextWatcher {
             val progressBar = startProgressBar(_act,R.id.login_progressBar)
         it.child("users/${FirebaseDB.encodeUserEmail(email)}").ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
-                if (p0.exists() && p0.child("authentication_vendor").value.toString().toLowerCase() == "app") {
+                if (p0.exists() && p0.child("authentication_vendor").value == "app") {
                     if (p0.child("password").value == password) {
                         val map: HashMap<String, String> = HashMap()
                         map["authentication_vendor"] = p0.child("authentication_vendor").value.toString()

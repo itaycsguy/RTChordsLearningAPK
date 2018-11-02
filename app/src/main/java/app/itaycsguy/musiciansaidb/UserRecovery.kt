@@ -13,7 +13,6 @@ import android.app.Activity
 import android.support.v4.content.ContextCompat.getSystemService
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import android.widget.Toast
 
 
 class UserRecovery(act : AppCompatActivity,fbAuth : FirebaseAuth) : TextWatcher {
@@ -50,7 +49,7 @@ class UserRecovery(act : AppCompatActivity,fbAuth : FirebaseAuth) : TextWatcher 
                     task ->
                     // TODO: need to callback this method for update his new password determination
                     if (task.isSuccessful) {
-                        CustomSnackBar.make(_act,   "Email has been sent already.. Check your Inbox!,${task.result}")
+                        CustomSnackBar.make(_act,   "Email has been sent already.. Check your Inbox!")
                         stopProgressBar(progressBar)
                         _act.showLogin()
                     }

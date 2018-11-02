@@ -3,10 +3,6 @@ package app.itaycsguy.musiciansaidb
 class User(details : HashMap<String,String>) {
     private val _details : HashMap<*, *> = details.clone() as HashMap<*, *>
 
-    companion object {
-        val BASIC_PERMISSION = "anonymous"
-    }
-
     fun getHashDetails() : HashMap<*, *> {
         return _details
     }
