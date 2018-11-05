@@ -31,8 +31,8 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.yalantis.ucrop.UCrop
+import com.yalantis.ucrop.model.AspectRatio
 import java.io.File
-import java.io.FileNotFoundException
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -63,8 +63,10 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
      */
     private var _imageHashPath : String? = null
     private var _placesLocation : String? = null
-    private var _notesName : String? = null
-    private var _writersName : String? = null
+    private var _noteName : String? = null
+    private var _noteFeatureName : String? = null
+    private var _noteSubFeatureName : String? = null
+    private var _groupName : String? = null
     private lateinit var _alertDialog : AlertDialog
     private var _isMetadataEnable : Boolean = false
 
@@ -119,6 +121,7 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
             makeRequest()
         }
 
+
         uploadButton.setOnClickListener {
             if(uri != null) {
                 uploadImage()
@@ -127,101 +130,183 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
             }
         }
         findViewById<FloatingActionButton>(R.id.metaDataButton).setOnClickListener { _ ->
-            if(uri == null){ Toast.makeText(this, "Pick an image prior to setting it's metadata!", Toast.LENGTH_LONG).show() }
+            if(uri == null){ Toast.makeText(this, "Pick an image prior to metadata settings!", Toast.LENGTH_LONG).show() }
             else{ buildMetadataDialog() }
         }
     }
 
+    @SuppressLint("InflateParams")
     private fun buildMetadataDialog() : AlertDialog{
         val currAct = this
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Current-Image-Metadata")
-                .setView(layoutInflater.inflate(R.layout.activity_metadata,null))
-                .setPositiveButton("OK") { _, _ ->
+        val builder = AlertDialog.Builder(currAct)
+        builder.setTitle("Current Image Metadata")
+            .setView(layoutInflater.inflate(R.layout.activity_metadata,null))
+            .setPositiveButton("OK") { _, _ ->
+                if(checkMetadataEnable()) {
+                    _isMetadataEnable = true
                     Toast.makeText(this, "Kept selections!", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "Required fields are missing!", Toast.LENGTH_LONG).show()
                 }
+
+            }
             .setNegativeButton("Cancel") { dialog, _ ->
                 layoutInflater.inflate(R.layout.menu_activity,null)
                 dialog.cancel()
-        }
+            }
         _alertDialog = builder.create()
         _alertDialog.show()
-//      add dropdown field:
-//      ===================
-        val writerSpinner : Spinner = _alertDialog.findViewById(R.id.metadata_writer)
-        val writersArray = resources.getStringArray(R.array.writers_array)
-        val writerDataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, writersArray)
-        writerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        writerSpinner.adapter = writerDataAdapter
-        _alertDialog.findViewById<Spinner>(R.id.metadata_writer).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+//        add dropdown field:
+//        ===================
+        val notesSpinner : Spinner = _alertDialog.findViewById(R.id.metadata_note_name)
+        val chordsArray = resources.getStringArray(R.array.single_notes_array)
+        val dataAdapter = ArrayAdapter(_alertDialog.context, android.R.layout.simple_spinner_item, chordsArray)
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        notesSpinner.adapter = dataAdapter
+        notesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
 
+            @SuppressLint("ResourceType")
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                p0?.let {
-                    _writersName = it.getItemAtPosition(p2).toString()
+                p0?.let { it ->
+                    _noteName = it.getItemAtPosition(p2).toString()
                     when {
-                            _writersName.equals("Choose Writer Type...") -> {
-                                _writersName = null
-                                it.setSelection(0)
+                        (_noteName!!.toLowerCase() == "search note name...") -> {
+                            it.setSelection(0)
+                            _noteName = null
+                            _noteFeatureName = null
+                            _noteSubFeatureName = null
+                            try{
+                                _alertDialog.findViewById<Spinner>(R.id.metadata_feature_note_name).visibility = View.GONE
+                                _alertDialog.findViewById<Spinner>(R.id.metadata_sub_feature_note_name).visibility = View.GONE
+                            }catch(_:Exception){}
+
                         }
-                            _writersName.equals("Special Writer") -> {
-                                _writersName = null
-                                val freeInput = EditText(currAct)
-                                freeInput.hint = "Type Special Writer Name"
-                                freeInput.inputType = InputType.TYPE_CLASS_TEXT
-                                val builder = AlertDialog.Builder(currAct)
-                                builder.setTitle("Special Writer:")
-                                        .setView(freeInput)
-                                        .setPositiveButton("OK") { _, _ ->
-                                            _notesName = freeInput.text.toString()
-                                            Toast.makeText(currAct,"$_notesName",Toast.LENGTH_LONG).show()
-                                        }
-                                builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
-                                builder.create().show()
+                        (_noteName!!.toLowerCase() == "special note") -> {
+                            _noteName = null
+                            val freeInput = EditText(currAct)
+                            freeInput.hint = "Type Special Note Name"
+                            freeInput.inputType = InputType.TYPE_CLASS_TEXT
+                            val builder = AlertDialog.Builder(currAct)
+                            builder.setTitle("Special Note:").setView(freeInput).setPositiveButton("OK") { _, _ ->
+                                        _noteName = freeInput.text.toString()
+                                        Toast.makeText(currAct, "$_noteName", Toast.LENGTH_LONG).show()
+                                    }.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+                            builder.create().show()
+                        }
+                        (_noteName!!.toLowerCase() == "clef") -> {
+                            val featureNote = _alertDialog.findViewById<Spinner>(R.id.metadata_feature_note_name)
+                            featureNote.visibility = View.VISIBLE
+                            val clefArray = resources.getStringArray(R.array.clef_array)
+                            val clefDataAdapter = ArrayAdapter(currAct, android.R.layout.simple_spinner_item, clefArray)
+                            clefDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                            featureNote.adapter = clefDataAdapter
+                            _alertDialog.findViewById<Spinner>(R.id.metadata_feature_note_name).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                                override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+                                @SuppressLint("ResourceType")
+                                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                                    p0?.let {
+                                        _noteFeatureName = it.getItemAtPosition(p2).toString()
+                                    }
+                                }
                             }
+                        }
+                        (_noteName!!.toLowerCase() == "rest") -> {
+                            val featureNote = _alertDialog.findViewById<Spinner>(R.id.metadata_feature_note_name)
+                            featureNote.visibility = View.VISIBLE
+                            val restArray = resources.getStringArray(R.array.rest_array)
+                            val restDataAdapter = ArrayAdapter(currAct, android.R.layout.simple_spinner_item, restArray)
+                            restDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                            featureNote.adapter = restDataAdapter
+                            _alertDialog.findViewById<Spinner>(R.id.metadata_feature_note_name).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                                override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+                                @SuppressLint("ResourceType")
+                                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                                    p0?.let {
+                                        _noteFeatureName = it.getItemAtPosition(p2).toString()
+                                    }
+                                }
+                            }
+                        }
+                        (_noteName!!.toLowerCase() == "note") -> {
+                            // basic note notes:
+                            val nFeatureNote = _alertDialog.findViewById<Spinner>(R.id.metadata_feature_note_name)
+                            nFeatureNote.visibility = View.VISIBLE
+                            val nNoteArray = resources.getStringArray(R.array.note_array)
+                            val nNoteDataAdapter = ArrayAdapter(currAct, android.R.layout.simple_spinner_item, nNoteArray)
+                            nNoteDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                            nFeatureNote.adapter = nNoteDataAdapter
+                            _alertDialog.findViewById<Spinner>(R.id.metadata_feature_note_name).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                                override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+                                @SuppressLint("ResourceType")
+                                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                                    p0?.let {
+                                        _noteFeatureName = it.getItemAtPosition(p2).toString()
+                                    }
+                                }
+                            }
+
+                            // first feature:
+                            val fFeatureNote = _alertDialog.findViewById<Spinner>(R.id.metadata_sub_feature_note_name)
+                            fFeatureNote.visibility = View.VISIBLE
+                            val fNoteArray = resources.getStringArray(R.array.feature_array)
+                            val fNoteDataAdapter = ArrayAdapter(currAct, android.R.layout.simple_spinner_item, fNoteArray)
+                            fNoteDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                            fFeatureNote.adapter = fNoteDataAdapter
+                            _alertDialog.findViewById<Spinner>(R.id.metadata_sub_feature_note_name).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                                override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+                                @SuppressLint("ResourceType")
+                                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                                    p0?.let {
+                                        _noteSubFeatureName = it.getItemAtPosition(p2).toString()
+                                    }
+                                }
+                            }
+                        }
                     }
-                    if(checkMetadataEnable()) { _isMetadataEnable = true }
                 }
 
             }
         }
 //        add dropdown field:
 //        ===================
-        val notesSpinner : Spinner = _alertDialog.findViewById(R.id.metadata_note_name)
-        val chordsArray = resources.getStringArray(R.array.notes_array)
-        val dataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, chordsArray)
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        notesSpinner.adapter = dataAdapter
-        _alertDialog.findViewById<Spinner>(R.id.metadata_note_name).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        val groupsSpinner : Spinner = _alertDialog.findViewById(R.id.metadata_group_belonging_name)
+        val groupsArray = resources.getStringArray(R.array.research_groups_array)
+        val dataGroupsAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, groupsArray)
+        dataGroupsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        groupsSpinner.adapter = dataGroupsAdapter
+        groupsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
 
+            @SuppressLint("ResourceType")
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 p0?.let {
-                    _notesName = it.getItemAtPosition(p2).toString()
-                    when {
-                            _notesName.equals("Choose Note Type...") -> {
-                                _notesName = null
-                                it.setSelection(0)
+                    _groupName = it.getItemAtPosition(p2).toString()
+                    when{
+                        _groupName.equals("Search Research Group Name...") -> {
+                            _groupName = null
+                            it.setSelection(0)
                         }
-                            _notesName.equals("Special Note") -> {
-                                _notesName = null
-                                val freeInput = EditText(currAct)
-                                freeInput.hint = "Type Special Note Name"
-                                freeInput.inputType = InputType.TYPE_CLASS_TEXT
-                                val builder = AlertDialog.Builder(currAct)
-                                builder.setTitle("Special Note:")
+                        _groupName.equals("Special Research Group") -> {
+                            _groupName = null
+                            val freeInput = EditText(currAct)
+                            freeInput.hint = "Type: Special Special Research Group Name"
+                            freeInput.inputType = InputType.TYPE_CLASS_TEXT
+                            val builder = AlertDialog.Builder(currAct)
+                            builder.setTitle("Special Research Group:")
                                     .setView(freeInput)
                                     .setPositiveButton("OK") { _, _ ->
-                                        _notesName = freeInput.text.toString()
-                                        Toast.makeText(currAct,"$_notesName",Toast.LENGTH_LONG).show()
+                                        _groupName = freeInput.text.toString()
                                     }
-                                builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
-                                builder.create().show()
-                            }
+                            builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+                            builder.create().show()
+                        }
                     }
-                    if(checkMetadataEnable()) { _isMetadataEnable = true }
                 }
-
             }
         }
 //        add google places search field:
@@ -282,23 +367,8 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
             }
             REQUEST_IMAGE_CAPTURE -> {
                 if ((resultCode == Activity.RESULT_OK)
-                                .and(data != null).or(uri != null)){
-                    if ((data != null).and(uri == null)){
-                        uri = data!!.data
-
-                    }
-                    //uri != null here
-                    //Since canceling taking a picture on some devices will still get us here we will try to set the image to make sure it was taken.
-                    val image = File(uri?.path)
-                    if(image.exists()) {
-                        MediaScannerConnection.scanFile(this, listOf(uri?.path).toTypedArray(), listOf("image/jpeg").toTypedArray(), null)
-                        currentImage.setImageURI(uri)
-                        openCrop()
-                    }
-                    else{//Reaching here or the else below means that the uri is pointing into an empty file location.
-                        uri = null
-                        currentImage.setImageResource(R.drawable.common_full_open_on_phone)
-                    }
+                                .and(data != null).or(uri != null) ) {
+                    openCrop()
                 } else{
                     //Reaching here means that the uri is pointing into an empty file location.
                     uri = null
@@ -325,17 +395,17 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                     val locationField = _alertDialog.findViewById<TextView>(R.id.google_location_name)
                     locationField.text = _placesLocation
                     locationField.gravity = Gravity.LEFT
-                    if(checkMetadataEnable()) { _isMetadataEnable = true }
                 }
             }
         }
-
     }
 
     private fun checkMetadataEnable() : Boolean {
-        if(_writersName != null &&
-//                _placesLocation != null && //TODO: Add this back once its fixed! - Morag.
-                _notesName != null) return true
+        if(!(_alertDialog.findViewById<EditText>(R.id.metadata_writer).text.isNullOrEmpty()) &&
+                _noteName != null && (_noteFeatureName != null  || _noteSubFeatureName != null) &&
+                _groupName != null) /* _placesLocation != null */ { // TODO: return once location is valid for all APIs
+            return true
+        }
         return false
     }
 
@@ -363,8 +433,9 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
         startActivity(intent)
     }
 
+
     private fun uploadImage() {
-        if (_isMetadataEnable){
+        if (uri != null && _isMetadataEnable){
             val infoText: String = if (_user.getPermission().toLowerCase() == User.BASIC_PERMISSION) {
                 "The Image is pending for approval before entering our database, thanks for your support"
             } else {
@@ -394,8 +465,12 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                     .addOnProgressListener{
                         progressBar.progress = (100.0*it.bytesTransferred/it.totalByteCount).toInt()
                     }
-        } else if(_isMetadataEnable.not()){
+        } else if(uri == null) {
+            Toast.makeText(this, "Pick an image prior to uploading operation!", Toast.LENGTH_LONG).show()
+        } else if(!_isMetadataEnable){
             Toast.makeText(this,"In order to upload you must provide the image's metadata.", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this,"In order to upload you need to first pick a picture.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -403,11 +478,21 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
         try {
             //First we check if there was a picture picked and the wanted crop isn't on the filler.
             if (uri == null) {
-              Toast.makeText(this,"In order to crop you need to first pick a picture.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,"In order to crop you need to first pick a picture", Toast.LENGTH_SHORT).show()
             }
             else {
+                val options = UCrop.Options()
+                options.setFreeStyleCropEnabled(true)
+                options.setAspectRatioOptions(
+                        1,
+                        AspectRatio("1:1", 1F, 1F),
+                        AspectRatio("4:3", 4F, 3F),
+                        AspectRatio("3:2", 3F, 2F),
+                        AspectRatio("16:9", 16F, 9F)
+                )
+                options.useSourceImageAspectRatio()
                 UCrop.of(uri!!, uri!!)
-                        .withAspectRatio(16.toFloat(), 9.toFloat())
+                        .withOptions(options)
                         .start(this)
             }
         }
@@ -475,15 +560,26 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
                 if (_imageHashPath != null) {
                     val map = HashMap<String, String>()
                     map["email"] = FirebaseDB.encodeUserEmail(_user.getEmail())
-                    map["writer"] = _writersName.toString()
-                    map["note_name"] = _notesName.toString()
+                    map["writer"] = _alertDialog.findViewById<EditText>(R.id.metadata_writer).text.toString()
+                    map["note_name"] = _noteName.toString()
+                    var noteFeature = ""
+                    var noteSubFeature = ""
+                    if(_noteFeatureName != null) {
+                        noteFeature = _noteFeatureName!!
+                    }
+                    if(_noteSubFeatureName != null){
+                        noteSubFeature = _noteSubFeatureName!!
+                    }
+                    map["note_feature"] = noteFeature
+                    map["note_sub_feature"] = noteSubFeature
+                    map["note_additionals"] = _alertDialog.findViewById<EditText>(R.id.metadata_note_additionals).text.toString()
+                    map["group"] = _groupName.toString()
                     map["location"] = _placesLocation.toString()
                     map["upload_time"] = (System.currentTimeMillis()/1000).toString()
                     try {
                         _firebaseDB.writeTempImagesMetadata(_imageHashPath.toString(), map)
                         Toast.makeText(currAct, "DB was updated successfully!", Toast.LENGTH_LONG).show()
-                        _writersName = null
-                        _notesName = null
+                        _noteName = null
                         _placesLocation = null
                     } catch (e: Exception) {
                         Toast.makeText(currAct, "Could not meet an updating", Toast.LENGTH_LONG).show()
