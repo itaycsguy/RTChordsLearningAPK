@@ -401,9 +401,12 @@ class MenuActivity() : AppCompatActivity(), Parcelable ,GoogleApiClient.OnConnec
     }
 
     private fun checkMetadataEnable() : Boolean {
-        if(!(_alertDialog.findViewById<EditText>(R.id.metadata_writer).text.isNullOrEmpty()) &&
-                _noteName != null && (_noteFeatureName != null  || _noteSubFeatureName != null) &&
-                _groupName != null) /* _placesLocation != null */ { // TODO: return once location is valid for all APIs
+        if((_alertDialog.findViewById<EditText>(R.id.metadata_writer).text.isNullOrEmpty().not())
+                        .and(_noteName.isNullOrBlank().not())
+                        .and ((_noteFeatureName.isNullOrBlank().not())
+                                .or(_noteSubFeatureName.isNullOrBlank().not()))
+                        .and(_groupName.isNullOrBlank().not()))
+        /* _placesLocation != null */ { // TODO: return once location is valid for all APIs
             return true
         }
         return false
