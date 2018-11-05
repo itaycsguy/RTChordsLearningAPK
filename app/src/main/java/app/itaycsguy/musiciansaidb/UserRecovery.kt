@@ -1,19 +1,10 @@
 package app.itaycsguy.musiciansaidb
 
-import android.graphics.Color
-import android.inputmethodservice.Keyboard
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.Gravity
 import android.widget.Button
 import android.widget.EditText
-import android.app.Activity
-import android.support.v4.content.ContextCompat.getSystemService
-import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
-import android.widget.Toast
 
 
 class UserRecovery(act : AppCompatActivity,fbAuth : FirebaseAuth) : TextWatcher {
@@ -53,8 +44,7 @@ class UserRecovery(act : AppCompatActivity,fbAuth : FirebaseAuth) : TextWatcher 
                         CustomSnackBar.make(_act,   "Email has been sent already.. Check your Inbox!,${task.result}")
                         stopProgressBar(progressBar)
                         _act.showLogin()
-                    }
-                    else {
+                    } else {
                         CustomSnackBar.make(_act,   "Had failure by sending.")
                         stopProgressBar(progressBar)
                     }

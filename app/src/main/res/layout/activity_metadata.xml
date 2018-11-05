@@ -5,46 +5,94 @@
     android:orientation="vertical"
     tools:ignore="MissingDefaultResource">
 
-    <Spinner
+    <EditText
         android:id="@+id/metadata_writer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/_30sdp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:hint="Type Writer Name"
+        android:hint="Type: Writer Name"
         android:inputType="text"
-        android:textSize="@dimen/_14sdp"
+        android:textSize="@dimen/_12sdp"
         tools:ignore="ObsoleteLayoutParam,RtlHardcoded" />
 
     <Spinner
         android:id="@+id/metadata_note_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:hint="Search Note Type"
-        android:textSize="@dimen/_14sdp"
-        tools:ignore="ObsoleteLayoutParam,RtlHardcoded" />
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-        <Button
-        android:id="@+id/google_maps"
-        android:layout_width="@dimen/_30sdp"
         android:layout_height="@dimen/_30sdp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:background="@drawable/places_ic_search"
+        android:textSize="@dimen/_12sdp"
+        tools:ignore="ObsoleteLayoutParam,RtlHardcoded" />
+
+    <Spinner
+        android:id="@+id/metadata_feature_note_name"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:textSize="@dimen/_12sdp"
+        android:visibility="gone"
+        tools:ignore="ObsoleteLayoutParam,RtlHardcoded" />
+
+    <Spinner
+        android:id="@+id/metadata_sub_feature_note_name"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:hint="Search Note Type"
+        android:textSize="@dimen/_12sdp"
+        android:visibility="gone"
+        tools:ignore="ObsoleteLayoutParam,RtlHardcoded" />
+
+    <EditText
+        android:id="@+id/metadata_note_additionals"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:hint="Type: Copyist ,Manuscript(shelfmark) ,Page ,Remarks"
+        android:inputType="text"
+        android:textSize="@dimen/_10sdp"
+        tools:ignore="ObsoleteLayoutParam,RtlHardcoded" />
+
+    <Spinner
+        android:id="@+id/metadata_group_belonging_name"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:textSize="@dimen/_12sdp"
+        tools:ignore="ObsoleteLayoutParam,RtlHardcoded" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/google_maps"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginRight="7dp"
+            android:background="@drawable/places_ic_search"
             tools:ignore="RtlHardcoded" />
 
-            <TextView
-                android:id="@+id/google_location_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/_14sdp"
-                android:hint="Search Discovering Location"/>
-        </RelativeLayout>
+        <TextView
+            android:id="@+id/google_location_name"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_30sdp"
+            android:hint="Search Discovering Location"
+            android:textSize="@dimen/_12sdp"
+            tools:ignore="RelativeOverlap" />
+    </RelativeLayout>
 </LinearLayout>
