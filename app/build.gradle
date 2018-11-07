@@ -40,15 +40,15 @@ dependencies {
     // outer dependency:
     implementation 'com.github.bumptech.glide:glide:3.7.0'
     implementation 'com.github.yalantis:ucrop:2.2.2-native'
-
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':simple-crop-image-lib')
-
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
     implementation 'com.google.android.gms:play-services-places:16.0.0'
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation files('libs/activation.jar')
+    implementation files('libs/additionnal.jar')
 }
 apply plugin: 'com.google.gms.google-services'

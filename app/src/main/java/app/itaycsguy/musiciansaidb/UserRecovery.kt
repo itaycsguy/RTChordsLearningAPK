@@ -3,6 +3,7 @@ package app.itaycsguy.musiciansaidb
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 
@@ -34,20 +35,16 @@ class UserRecovery(act : AppCompatActivity,fbAuth : FirebaseAuth) : TextWatcher 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
-    private fun sendEmail(email: String) {
-        val progressBar = startProgressBar(_act,R.id.recovery_progressBar)
-        _fbAuth.getInstance().sendPasswordResetEmail(email)
-                .addOnCompleteListener {
-                    task ->
-                    // TODO: need to callback this method for update his new password determination
-                    if (task.isSuccessful) {
-                        CustomSnackBar.make(_act,   "Email has been sent already.. Check your Inbox!,${task.result}")
-                        stopProgressBar(progressBar)
-                        _act.showLogin()
-                    } else {
-                        CustomSnackBar.make(_act,   "Had failure by sending.")
-                        stopProgressBar(progressBar)
-                    }
-                }
+    private fun sendEmail(email : String) {
+        try {
+            val thread = Runnable {
+                val sender = GMailSender("musical.lab100@gmail.com", "@123mlab")
+                sender.sendMail("This is Subject", "This is Body", email, "")
+            }
+            thread.run()
+        } catch (e: Exception) {
+            Log.e("SendMail", e.message, e)
+        }
+
     }
 }
