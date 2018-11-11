@@ -28,7 +28,7 @@ class StartActivity : AppCompatActivity(), Serializable {
         _gAcct = GoogleAuth(this)
         _aAuth = AppAuth(this, _fbDb)
         _signApp = SignApp(this,_fbDb)
-        _userRecovery = UserRecovery(this,_fbAuth)
+        _userRecovery = UserRecovery(this,_fbDb)
         showLogin()
     }
 
