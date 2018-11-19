@@ -17,20 +17,6 @@ class FirebaseAuth(act : AppCompatActivity) {
         return _fbAuth
     }
 
-    fun connect() : Boolean {
-        return try {
-            if(_gso != null){
-                return true
-            }
-            _gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(R.string.default_web_client_id.toString()).requestEmail().build()
-            CustomSnackBar.make(_act,"Connected to firebase!")
-            true
-        } catch(e : java.lang.Exception){
-            CustomSnackBar.make(_act,"Could not connect to firebase.")
-            false
-        }
-    }
-
     fun connectByGoogleAcct(acct : GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
         this._fbAuth.signInWithCredential(credential).addOnCompleteListener { task ->
