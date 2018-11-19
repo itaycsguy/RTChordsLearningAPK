@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">MusiciansAIDB</string>
+    <string name="firebase_app_ip">"1:45656593958:android:e35639db79916457"</string>
+    <string name="firebase_api_key">"AIzaSyDiGUAvV4w6YxyymYsziCASCXjv39IuiM8"</string>
+    <string name="firebase_db_url">"https://musiciansdb-ccff5.firebaseio.com"</string>
+    <string name="firebase_storage_url">"musiciansdb-ccff5.appspot.com"</string>
     <string name="sign_in">Sign-In</string>
     <string name="sign_up">Sign-Up</string>
     <string name="title_activity_upload_page">UploadPage</string>

@@ -8,6 +8,12 @@ import android.graphics.Color
 import android.view.View
 import android.widget.ProgressBar
 import java.io.Serializable
+import com.google.firebase.FirebaseOptions
+import com.google.firebase.FirebaseApp
+import java.lang.Exception
+import java.lang.IllegalStateException
+import java.util.*
+
 
 class StartActivity : AppCompatActivity(), Serializable {
     private var _currLayout : Int = R.layout.activity_login
@@ -17,12 +23,13 @@ class StartActivity : AppCompatActivity(), Serializable {
     private lateinit var _aAuth : AppAuth
     private lateinit var _signApp : SignApp
     private lateinit var _userRecovery : UserRecovery
-    private lateinit var _userData : HashMap<String,String>
+    private lateinit var _userData : HashMap<String, String>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_currLayout)
+        initFirebase()
         _fbAuth = FirebaseAuth(this)
         _fbDb = FirebaseDB()
         _gAcct = GoogleAuth(this)
@@ -31,6 +38,18 @@ class StartActivity : AppCompatActivity(), Serializable {
         _userRecovery = UserRecovery(this,_fbDb)
         showLogin()
     }
+
+   private fun initFirebase() = try {
+       val builder = FirebaseOptions.Builder()
+               .setApplicationId(getString(R.string.firebase_app_ip))
+               .setApiKey(getString(R.string.firebase_api_key))
+               .setDatabaseUrl(getString(R.string.firebase_db_url))
+               .setStorageBucket(getString(R.string.firebase_storage_url))
+       FirebaseApp.initializeApp(this, builder.build())
+       CustomSnackBar.make(this,"Connected to Firebase!")
+   }
+   catch(ei: IllegalStateException) { CustomSnackBar.make(this,"Firebase is connected already!") }
+   catch(e: Exception){ CustomSnackBar.make(this,"Could not connect to firebase.") }
 
     override fun onStart() {
         super.onStart()

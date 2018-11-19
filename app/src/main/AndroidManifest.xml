@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="app.itaycsguy.musiciansaidb">
 
@@ -37,6 +38,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="1:45656593958:android:e35639db79916457.firebaseinitprovider"
+            tools:node="remove"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

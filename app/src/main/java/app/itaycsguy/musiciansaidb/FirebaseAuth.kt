@@ -33,7 +33,10 @@ class FirebaseAuth(act : AppCompatActivity) {
         }
     }
 
+    /*
+    // TODO: Due to we do not using Firebase users' managememt service - to enhance the service we should use it!
     fun disconnect() {
         this._fbAuth.signOut()
     }
+    */
 }
