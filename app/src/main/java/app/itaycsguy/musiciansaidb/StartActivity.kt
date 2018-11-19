@@ -37,6 +37,7 @@ class StartActivity : AppCompatActivity(), Serializable {
         _signApp = SignApp(this,_fbDb)
         _userRecovery = UserRecovery(this,_fbDb)
         showLogin()
+        _fbAuth.connect()
     }
 
    private fun initFirebase() = try {
@@ -102,12 +103,12 @@ class StartActivity : AppCompatActivity(), Serializable {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == _gAcct.getReqCode()) {
+        if(_fbAuth.connect() && requestCode == _gAcct.getReqCode()) {
             _gAcct.handleResults(data)
             _fbAuth.connectByGoogleAcct(_gAcct.getGoogleResult().signInAccount!!)
             _userData = _gAcct.getUserData()
             writeProfileOnTransaction()
-        } else if(requestCode == _aAuth.getReqCode()) {
+        } else if(_fbAuth.connect() && requestCode == _aAuth.getReqCode()) {
             _aAuth.handleResults(data)
             _userData = _aAuth.getUserData()
             if(_userData.containsKey("email") && _userData.containsKey("password")) {
@@ -116,7 +117,8 @@ class StartActivity : AppCompatActivity(), Serializable {
                 findViewById<EditText>(R.id.text_welcome_password).setText(_userData["password"])
                 writeProfileOnTransaction()
             }
-        } else if(requestCode == _signApp.getReqCode() || requestCode == _signApp.getReqGalCode() || requestCode == _signApp.getReqCamCode()) {
+        } else if(_fbAuth.connect() &&
+                (requestCode == _signApp.getReqCode() || requestCode == _signApp.getReqGalCode() || requestCode == _signApp.getReqCamCode())) {
             _signApp.handleResult(requestCode, data)
             if(requestCode != _signApp.getReqCode()) { return }
             _userData = _signApp.getUserData()
