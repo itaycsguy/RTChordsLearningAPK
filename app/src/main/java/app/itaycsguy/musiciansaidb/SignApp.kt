@@ -1,12 +1,16 @@
 package app.itaycsguy.musiciansaidb
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
+import android.os.Parcelable
 import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
@@ -30,6 +34,8 @@ import kotlin.collections.HashMap
 
 @Suppress("NAME_SHADOWING", "NAME_SHADOWING")
 class SignApp(act : AppCompatActivity, fbDb : FirebaseDB) : AppCompatActivity(),TextWatcher {
+    private val TAG = "Permissions"
+    private val REQUEST_PERMISSION_CODE = 100
     private val STD_PASSWORD_TYPE = 129
     private val MIN_STRENGTH_PASSWORD = 0.4
     private val REQUEST_CODE = 2
@@ -112,7 +118,24 @@ class SignApp(act : AppCompatActivity, fbDb : FirebaseDB) : AppCompatActivity(),
                 CustomSnackBar.make(_act,"Some details are missing/invalid!")
             }
         }
-        _act.findViewById<Button>(R.id.registiration_attach_photo_button).setOnClickListener { showPhotoDialog() }
+        _act.findViewById<Button>(R.id.registiration_attach_photo_button).setOnClickListener {
+            val permissionCameraCheck = ContextCompat.checkSelfPermission(_act, android.Manifest.permission.CAMERA)
+            val permissionWriteCheck = ContextCompat.checkSelfPermission(_act, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            val permissionReadCheck = ContextCompat.checkSelfPermission(_act, android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            if ((permissionCameraCheck == PackageManager.PERMISSION_DENIED)
+                            .or(permissionReadCheck == PackageManager.PERMISSION_DENIED)
+                            .or(permissionWriteCheck == PackageManager.PERMISSION_DENIED))
+            {
+                Log.i(TAG, "One of the Permission has been denied.")
+                ActivityCompat.requestPermissions(
+                        _act,
+                        arrayOf(android.Manifest.permission.CAMERA,
+                                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        ,REQUEST_PERMISSION_CODE)
+                // if it is granted by user - call to showPhotoDialog()
+            } else { showPhotoDialog() }
+        }
         _act.findViewById<Button>(R.id.registiration_cancel_button).setOnClickListener { _act.showLogin() }
         _act.findViewById<Button>(R.id.signup_visible_password).setOnClickListener {
             val visibleBtn = _act.findViewById<Button>(R.id.signup_visible_password)
@@ -363,5 +386,18 @@ class SignApp(act : AppCompatActivity, fbDb : FirebaseDB) : AppCompatActivity(),
             e1.printStackTrace()
         }
         return ""
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_PERMISSION_CODE -> {
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Log.i(TAG, "Permission has been denied by user")
+                } else {
+                    Log.i(TAG, "Permission has been granted by user")
+                    showPhotoDialog()
+                }
+            }
+        }
     }
 }

@@ -5,30 +5,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import android.support.v7.app.AppCompatActivity
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 
 class FirebaseAuth(act : AppCompatActivity) {
     private val _act : AppCompatActivity = act
     private val _fbAuth : FirebaseAuth = FirebaseAuth.getInstance()
-    private var _gso : GoogleSignInOptions? = null
 
     fun getInstance() : FirebaseAuth{
         return _fbAuth
-    }
-
-    fun connect() : Boolean {
-        return try {
-            if(_gso != null){
-                return true
-            }
-            _gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(R.string.default_web_client_id.toString()).requestEmail().build()
-            CustomSnackBar.make(_act,"Connected to firebase!")
-            true
-        } catch(e : java.lang.Exception){
-            CustomSnackBar.make(_act,"Could not connect to firebase.")
-            false
-        }
     }
 
     fun connectByGoogleAcct(acct : GoogleSignInAccount) {
@@ -49,7 +33,10 @@ class FirebaseAuth(act : AppCompatActivity) {
         }
     }
 
+    /*
+    // TODO: Due to we do not using Firebase users' managememt service - to enhance the service we should use it!
     fun disconnect() {
         this._fbAuth.signOut()
     }
+    */
 }
